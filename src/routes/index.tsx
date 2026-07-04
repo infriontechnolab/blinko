@@ -12,8 +12,8 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const featured = products.slice(0, 4);
-  const pantry = products.filter((p) => p.categoryId === "pantry").slice(0, 4);
-  const ready = products.filter((p) => p.categoryId === "ready");
+  const pantry = products.filter((p) => p.categoryId === "grocery-staples").slice(0, 4);
+  const ready = products.filter((p) => p.categoryId === "frozen");
   const { open: catsOpen } = useCategoriesPanel();
 
   return (
@@ -101,7 +101,7 @@ function Index() {
           </p>
           <Link
             to="/browse"
-            search={{ category: "ready" }}
+            search={{ category: "frozen" }}
             className="mt-6 inline-flex items-center gap-2 rounded-lg bg-background px-4 py-2 text-sm font-semibold text-foreground"
           >
             Shop ready meals <ArrowRight className="size-4" />
@@ -115,7 +115,7 @@ function Index() {
           </p>
           <Link
             to="/browse"
-            search={{ category: "pantry" }}
+            search={{ category: "grocery-staples" }}
             className="mt-6 inline-flex items-center gap-2 rounded-lg bg-foreground px-4 py-2 text-sm font-semibold text-background"
           >
             Shop pantry <ArrowRight className="size-4" />

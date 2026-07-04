@@ -13,9 +13,9 @@ type Slide = {
 
 // Each slide leads with one department and one clean product shot.
 const SLIDES: Slide[] = [
-  { categoryId: "ready", eyebrow: "Kitchen off tonight", title: "Chef-made meals, just heat and eat", productId: "am-paneer-tikka" },
-  { categoryId: "produce", eyebrow: "Fresh this week", title: "Ripe, ready, at your door in minutes", productId: "am-avocado" },
-  { categoryId: "pantry", eyebrow: "Pantry restock", title: "Two-year aged basmati and staples", productId: "am-rice" },
+  { categoryId: "frozen", eyebrow: "Kitchen off tonight", title: "Chef-made meals, just heat and eat", productId: "am-paneer-tikka" },
+  { categoryId: "fruits-veg", eyebrow: "Fresh this week", title: "Ripe, ready, at your door in minutes", productId: "am-avocado" },
+  { categoryId: "grocery-staples", eyebrow: "Pantry restock", title: "Two-year aged basmati and staples", productId: "am-rice" },
 ];
 
 export function HeroCarousel() {

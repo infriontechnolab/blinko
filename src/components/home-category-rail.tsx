@@ -1,28 +1,49 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ChevronRight, Leaf, Wheat, Egg, Cookie, Soup, type LucideIcon } from "lucide-react";
-import { categories, productsByCategory } from "@/lib/mock-data";
+import {
+  ChevronRight,
+  Apple,
+  Beef,
+  Milk,
+  Croissant,
+  CupSoda,
+  Snowflake,
+  Cookie,
+  Wheat,
+  House,
+  HeartPulse,
+  Baby,
+  type LucideIcon,
+} from "lucide-react";
+import { categories } from "@/lib/mock-data";
 
 const departmentIcons: Record<string, LucideIcon> = {
-  produce: Leaf,
-  pantry: Wheat,
-  dairy: Egg,
-  snacks: Cookie,
-  ready: Soup,
+  "fruits-veg": Apple,
+  "meats-seafood": Beef,
+  "breakfast-dairy": Milk,
+  "breads-bakery": Croissant,
+  beverages: CupSoda,
+  frozen: Snowflake,
+  "biscuits-snacks": Cookie,
+  "grocery-staples": Wheat,
+  household: House,
+  healthcare: HeartPulse,
+  baby: Baby,
 };
 
 export function HomeCategoryRail() {
   const [active, setActive] = useState<string | null>(null);
   const activeCategory = categories.find((c) => c.id === active);
-  const subProducts = active ? productsByCategory(active).slice(0, 6) : [];
+  const subs = activeCategory?.subcategories ?? [];
 
   return (
     <div className="relative" onMouseLeave={() => setActive(null)}>
       <nav className="overflow-hidden rounded-md border border-border bg-surface">
         <ul>
           {categories.map((c) => {
-            const Icon = departmentIcons[c.id] ?? Leaf;
+            const Icon = departmentIcons[c.id] ?? Apple;
             const isActive = active === c.id;
+            const hasSubs = c.subcategories.length > 0;
             return (
               <li key={c.id}>
                 <Link
@@ -38,7 +59,9 @@ export function HomeCategoryRail() {
                 >
                   <Icon className="size-4 shrink-0 text-muted-foreground" />
                   <span className="flex-1">{c.name}</span>
-                  <ChevronRight className="size-4 shrink-0 text-muted-foreground/50" />
+                  {hasSubs ? (
+                    <ChevronRight className="size-4 shrink-0 text-muted-foreground/50" />
+                  ) : null}
                 </Link>
               </li>
             );
@@ -46,9 +69,9 @@ export function HomeCategoryRail() {
         </ul>
       </nav>
 
-      {/* Submenu flyout */}
-      {activeCategory && subProducts.length > 0 ? (
-        <div className="absolute left-full top-0 z-40 hidden h-full w-64 rounded-r-md border border-l-0 border-border bg-surface p-5 shadow-xl lg:block">
+      {/* Subcategory flyout */}
+      {activeCategory && subs.length > 0 ? (
+        <div className="absolute left-full top-0 z-40 hidden min-h-full w-72 rounded-r-md border border-l-0 border-border bg-surface p-5 shadow-xl lg:block">
           <div className="mb-3 flex items-baseline justify-between">
             <p className="text-sm font-bold text-foreground">{activeCategory.name}</p>
             <Link
@@ -59,15 +82,15 @@ export function HomeCategoryRail() {
               Shop all →
             </Link>
           </div>
-          <ul className="space-y-2">
-            {subProducts.map((p) => (
-              <li key={p.id}>
+          <ul className="grid grid-cols-2 gap-x-4 gap-y-2">
+            {subs.map((s) => (
+              <li key={s.id}>
                 <Link
-                  to="/products/$id"
-                  params={{ id: p.id }}
+                  to="/browse"
+                  search={{ category: activeCategory.id }}
                   className="block text-sm text-foreground/80 transition-colors hover:text-primary"
                 >
-                  {p.name}
+                  {s.name}
                 </Link>
               </li>
             ))}

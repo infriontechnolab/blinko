@@ -118,6 +118,7 @@ function Browse() {
               {categories.map((c) => {
                 const open = openCats.includes(c.id);
                 const active = category === c.id;
+                const hasSubs = c.subcategories.length > 0;
                 return (
                   <li key={c.id}>
                     <div
@@ -128,16 +129,30 @@ function Browse() {
                       <Link to="/browse" search={{ category: c.id }} className="flex-1 hover:text-primary">
                         {c.name}
                       </Link>
-                      <button
-                        onClick={() => setOpenCats((s) => toggle(s, c.id))}
-                        className="grid size-5 place-items-center rounded hover:bg-muted"
-                        aria-label={open ? "Collapse" : "Expand"}
-                      >
-                        {open ? <Minus className="size-3" /> : <Plus className="size-3" />}
-                      </button>
+                      {hasSubs ? (
+                        <button
+                          onClick={() => setOpenCats((s) => toggle(s, c.id))}
+                          className="grid size-5 place-items-center rounded hover:bg-muted"
+                          aria-label={open ? "Collapse" : "Expand"}
+                        >
+                          {open ? <Minus className="size-3" /> : <Plus className="size-3" />}
+                        </button>
+                      ) : null}
                     </div>
-                    {open ? (
-                      <p className="pl-3 pb-2 text-xs text-muted-foreground">{c.tagline}</p>
+                    {open && hasSubs ? (
+                      <ul className="mb-1 space-y-1 border-l border-border pl-3">
+                        {c.subcategories.map((s) => (
+                          <li key={s.id}>
+                            <Link
+                              to="/browse"
+                              search={{ category: c.id }}
+                              className="block py-0.5 text-xs text-muted-foreground hover:text-primary"
+                            >
+                              {s.name}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
                     ) : null}
                   </li>
                 );

@@ -27,9 +27,9 @@ function useCountdown(targetHoursFromNow: number) {
 const catNav = [
   { to: "/", label: "Home" },
   { to: "/browse", label: "Shop", search: undefined as { category?: string } | undefined },
-  { to: "/browse", label: "Fresh Produce", search: { category: "produce" } },
-  { to: "/browse", label: "Pantry", search: { category: "pantry" } },
-  { to: "/browse", label: "Dairy & Eggs", search: { category: "dairy" } },
+  { to: "/browse", label: "Fruits & Vegetables", search: { category: "fruits-veg" } },
+  { to: "/browse", label: "Meats & Seafood", search: { category: "meats-seafood" } },
+  { to: "/browse", label: "Beverages", search: { category: "beverages" } },
   { to: "/orders", label: "Orders" },
 ];
 
@@ -284,8 +284,8 @@ export function SiteHeader() {
               ))}
             </ul>
             <div className="border-t border-border p-2">
-              <p className="px-3 pb-1 pt-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                Departments
+              <p className="px-3 pb-1 pt-1 text-xs font-semibold text-muted-foreground">
+                All Categories
               </p>
               <ul className="flex flex-col">
                 {categories.map((c) => (
@@ -294,13 +294,10 @@ export function SiteHeader() {
                       to="/browse"
                       search={{ category: c.id }}
                       onClick={() => setMobileNav(false)}
-                      className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
+                      className="flex items-center justify-between rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
                     >
-                      <span
-                        className="inline-block size-3 rounded-full"
-                        style={{ backgroundColor: c.tint }}
-                      />
                       {c.name}
+                      <ChevronDown className="size-4 -rotate-90 text-muted-foreground/50" />
                     </Link>
                   </li>
                 ))}

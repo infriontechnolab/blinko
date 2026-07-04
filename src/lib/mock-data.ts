@@ -1,11 +1,13 @@
 // Mock catalog. seller_id / store_name simulate the multi-vendor backend
 // reality — NEVER render them in customer-facing UI.
 
+export type Subcategory = { id: string; name: string };
+
 export type Category = {
   id: string;
   name: string;
   tagline: string;
-  tint: string;
+  subcategories: Subcategory[];
 };
 
 export type ProductBadge = "organic" | "cold_sale" | "bestseller";
@@ -33,11 +35,82 @@ export type Product = {
 };
 
 export const categories: Category[] = [
-  { id: "produce", name: "Fresh Produce", tagline: "Picked at peak", tint: "oklch(0.92 0.08 140)" },
-  { id: "pantry", name: "Pantry Staples", tagline: "Everyday essentials", tint: "oklch(0.93 0.06 75)" },
-  { id: "dairy", name: "Dairy & Eggs", tagline: "Cold-chain fresh", tint: "oklch(0.95 0.03 220)" },
-  { id: "snacks", name: "Snacks", tagline: "Clean labels", tint: "oklch(0.92 0.08 40)" },
-  { id: "ready", name: "Ready-to-Eat", tagline: "Kitchen off", tint: "oklch(0.93 0.06 20)" },
+  {
+    id: "fruits-veg",
+    name: "Fruits & Vegetables",
+    tagline: "Picked at peak",
+    subcategories: [
+      { id: "cuts-sprouts", name: "Cuts & Sprouts" },
+      { id: "exotic", name: "Exotic Fruits & Veggies" },
+      { id: "fresh-fruits", name: "Fresh Fruits" },
+      { id: "fresh-veg", name: "Fresh Vegetables" },
+      { id: "herbs", name: "Herbs & Seasonings" },
+      { id: "packaged-produce", name: "Packaged Produce" },
+      { id: "party-trays", name: "Party Trays" },
+    ],
+  },
+  {
+    id: "meats-seafood",
+    name: "Meats & Seafood",
+    tagline: "Fresh cuts daily",
+    subcategories: [
+      { id: "beef", name: "Beef Products" },
+      { id: "chicken-turkey", name: "Chicken and Turkey Products" },
+      { id: "fish", name: "Fish Varieties" },
+      { id: "lamb", name: "Lamb Products" },
+      { id: "processed-red-meat", name: "Processed Red Meat Products" },
+      { id: "seafood", name: "Seafood" },
+    ],
+  },
+  {
+    id: "breakfast-dairy",
+    name: "Breakfast & Dairy",
+    tagline: "Cold-chain fresh",
+    subcategories: [
+      { id: "breads-cereal", name: "Breads and Cereal Products" },
+      { id: "breakfast-cereals-bars", name: "Breakfast Cereals and Bars" },
+      { id: "butter-margarine", name: "Butter & Margarine" },
+      { id: "cereals-granolas", name: "Cereals and Granolas" },
+      { id: "cheese", name: "Cheese Varieties" },
+      { id: "dairy-processing", name: "Dairy Processing Products" },
+      { id: "eggs", name: "Eggs and Egg Products" },
+      { id: "fresh-dairy", name: "Fresh Dairy Products" },
+    ],
+  },
+  {
+    id: "breads-bakery",
+    name: "Breads & Bakery",
+    tagline: "Baked fresh",
+    subcategories: [
+      { id: "pastries-rolls", name: "Bakery Pastries and Rolls" },
+      { id: "fresh-bread", name: "Fresh Bread Varieties" },
+      { id: "glazed-filled", name: "Glazed and Filled Products" },
+      { id: "gluten-free", name: "Gluten-Free Alternatives" },
+      { id: "organic-breads", name: "Organic and Natural Breads" },
+      { id: "pizza-flatbreads", name: "Pizza and Flatbreads" },
+      { id: "sandwich-wraps", name: "Sandwich Bread and Wraps" },
+      { id: "sweets-pastry", name: "Sweets and Pastry Products" },
+    ],
+  },
+  {
+    id: "beverages",
+    name: "Beverages",
+    tagline: "Sip & refresh",
+    subcategories: [
+      { id: "drink-boxes", name: "Drink Boxes & Pouches" },
+      { id: "coffee", name: "Coffee" },
+      { id: "craft-beer", name: "Craft Beer" },
+      { id: "milk-plant", name: "Milk & Plant-Based Milk" },
+      { id: "soda-pop", name: "Soda & Pop" },
+      { id: "sparkling-water", name: "Sparkling Water" },
+    ],
+  },
+  { id: "frozen", name: "Frozen Foods", tagline: "Heat & eat", subcategories: [] },
+  { id: "biscuits-snacks", name: "Biscuits & Snacks", tagline: "Clean labels", subcategories: [] },
+  { id: "grocery-staples", name: "Grocery & Staples", tagline: "Everyday essentials", subcategories: [] },
+  { id: "household", name: "Household Needs", tagline: "Home & clean", subcategories: [] },
+  { id: "healthcare", name: "Healthcare", tagline: "Wellness picks", subcategories: [] },
+  { id: "baby", name: "Baby & Pregnancy", tagline: "Little ones", subcategories: [] },
 ];
 
 export const brands = [
@@ -64,7 +137,7 @@ export const products: Product[] = [
   {
     id: "am-bananas",
     name: "Organic Bananas, 500g Bunch",
-    categoryId: "produce", brandId: "harvest",
+    categoryId: "fruits-veg", brandId: "harvest",
     price: 79, compareAtPrice: 99,
     unit: "500 g bunch",
     description: "Naturally ripened, thick-skinned bananas from small-batch growers.",
@@ -77,7 +150,7 @@ export const products: Product[] = [
   {
     id: "am-tomatoes",
     name: "Vine Tomatoes, 500g",
-    categoryId: "produce", brandId: "harvest",
+    categoryId: "fruits-veg", brandId: "harvest",
     price: 64, compareAtPrice: 79,
     unit: "500 g",
     description: "Juicy tomatoes ripened on the vine. Perfect for salads and slow-cooked curries.",
@@ -89,7 +162,7 @@ export const products: Product[] = [
   {
     id: "am-spinach",
     name: "Baby Spinach, Triple-Washed",
-    categoryId: "produce", brandId: "orchard",
+    categoryId: "fruits-veg", brandId: "orchard",
     price: 55,
     unit: "200 g pack",
     description: "Tender, triple-washed baby spinach. Ready to eat right out of the bag.",
@@ -102,7 +175,7 @@ export const products: Product[] = [
   {
     id: "am-avocado",
     name: "Hass Avocados, Ready to Eat",
-    categoryId: "produce", brandId: "orchard",
+    categoryId: "fruits-veg", brandId: "orchard",
     price: 199, compareAtPrice: 249,
     unit: "2 pcs",
     description: "Buttery, ripe-when-you-are Hass avocados. Sourced weekly.",
@@ -115,7 +188,7 @@ export const products: Product[] = [
   {
     id: "am-rice",
     name: "Aged Basmati Rice, 1 kg",
-    categoryId: "pantry", brandId: "millhouse",
+    categoryId: "grocery-staples", brandId: "millhouse",
     price: 349, compareAtPrice: 399,
     unit: "1 kg",
     description: "Two-year aged long-grain basmati. Fluffs up beautifully every time.",
@@ -127,7 +200,7 @@ export const products: Product[] = [
   {
     id: "am-oil",
     name: "Cold-Pressed Mustard Oil, 1 L",
-    categoryId: "pantry", brandId: "millhouse",
+    categoryId: "grocery-staples", brandId: "millhouse",
     price: 285, compareAtPrice: 349,
     unit: "1 L bottle",
     description: "Kachi ghani mustard oil, cold-pressed and unrefined. Bold flavour, rich colour.",
@@ -139,7 +212,7 @@ export const products: Product[] = [
   {
     id: "am-lentils",
     name: "Red Lentils, Stone-Cleaned 500g",
-    categoryId: "pantry", brandId: "millhouse",
+    categoryId: "grocery-staples", brandId: "millhouse",
     price: 129,
     unit: "500 g",
     description: "Split red lentils, sorted and stone-cleaned. Cook in under 20 minutes.",
@@ -151,7 +224,7 @@ export const products: Product[] = [
   {
     id: "am-milk",
     name: "Farm Fresh Whole Milk, 1 L",
-    categoryId: "dairy", brandId: "daily",
+    categoryId: "breakfast-dairy", brandId: "daily",
     price: 68,
     unit: "1 L",
     description: "A2 whole milk, pasteurised and bottled within hours of milking.",
@@ -164,7 +237,7 @@ export const products: Product[] = [
   {
     id: "am-eggs",
     name: "Brown Farm Eggs, Pack of 12",
-    categoryId: "dairy", brandId: "daily",
+    categoryId: "breakfast-dairy", brandId: "daily",
     price: 149, compareAtPrice: 179,
     unit: "12 pcs",
     description: "Free-range brown eggs from small farms. Deep-orange yolks, thick whites.",
@@ -177,7 +250,7 @@ export const products: Product[] = [
   {
     id: "am-yogurt",
     name: "Greek Yogurt, High Protein",
-    categoryId: "dairy", brandId: "daily",
+    categoryId: "breakfast-dairy", brandId: "daily",
     price: 95,
     unit: "200 g",
     description: "Thick, strained yogurt with 10 g protein per serving. No added sugar.",
@@ -190,7 +263,7 @@ export const products: Product[] = [
   {
     id: "am-granola",
     name: "Honey Almond Granola, 300g",
-    categoryId: "snacks", brandId: "kitchen",
+    categoryId: "biscuits-snacks", brandId: "kitchen",
     price: 249, compareAtPrice: 299,
     unit: "300 g",
     description: "Slow-baked oats with real honey and roasted almonds. No refined sugar.",
@@ -202,7 +275,7 @@ export const products: Product[] = [
   {
     id: "am-chips",
     name: "Kettle Chips, Sea Salt 150g",
-    categoryId: "snacks", brandId: "kitchen",
+    categoryId: "biscuits-snacks", brandId: "kitchen",
     price: 89, compareAtPrice: 109,
     unit: "150 g",
     description: "Hand-cooked in small batches. Extra crunch, just the right salt.",
@@ -214,7 +287,7 @@ export const products: Product[] = [
   {
     id: "am-dal",
     name: "Ready Dal Makhani, 300g Pouch",
-    categoryId: "ready", brandId: "kitchen",
+    categoryId: "frozen", brandId: "kitchen",
     price: 179, compareAtPrice: 219,
     unit: "300 g pouch",
     description: "Slow-cooked overnight the traditional way. Just heat and serve.",
@@ -226,7 +299,7 @@ export const products: Product[] = [
   {
     id: "am-paneer-tikka",
     name: "Paneer Tikka Bowl, 1 Serving",
-    categoryId: "ready", brandId: "kitchen",
+    categoryId: "frozen", brandId: "kitchen",
     price: 229,
     unit: "1 serving",
     description: "Char-grilled paneer with peppers and onions in a smoky masala.",
@@ -239,7 +312,7 @@ export const products: Product[] = [
   {
     id: "am-bread",
     name: "Artisan Sourdough Loaf, 450g",
-    categoryId: "pantry", brandId: "harvest",
+    categoryId: "breads-bakery", brandId: "harvest",
     price: 180, compareAtPrice: 220,
     unit: "450 g loaf",
     description: "Naturally leavened, 24-hour ferment. Crisp crust, open crumb.",
@@ -251,7 +324,7 @@ export const products: Product[] = [
   {
     id: "am-honey",
     name: "Wildflower Honey, 250g Jar",
-    categoryId: "pantry", brandId: "orchard",
+    categoryId: "grocery-staples", brandId: "orchard",
     price: 320,
     unit: "250 g jar",
     description: "Raw, unfiltered honey from Himalayan foothills. Floral and mellow.",
