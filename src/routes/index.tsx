@@ -3,6 +3,7 @@ import { ArrowRight, Leaf, Truck, ShieldCheck } from "lucide-react";
 import { ProductCard } from "@/components/product-card";
 import { HeroCarousel } from "@/components/hero-carousel";
 import { HomeCategoryRail } from "@/components/home-category-rail";
+import { useCategoriesPanel } from "@/lib/categories-panel";
 import { categories, products } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/")({
@@ -13,14 +14,19 @@ function Index() {
   const featured = products.slice(0, 4);
   const pantry = products.filter((p) => p.categoryId === "pantry").slice(0, 4);
   const ready = products.filter((p) => p.categoryId === "ready");
+  const { open: catsOpen } = useCategoriesPanel();
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 md:py-10">
-      {/* Hero: department rail + carousel */}
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[260px_1fr]">
-        <aside className="hidden lg:block">
-          <HomeCategoryRail />
-        </aside>
+      {/* Hero: toggleable "All Categories" panel + carousel */}
+      <div
+        className={`grid grid-cols-1 gap-4 ${catsOpen ? "lg:grid-cols-[260px_1fr]" : "lg:grid-cols-1"}`}
+      >
+        {catsOpen ? (
+          <aside id="home-categories-panel" className="hidden lg:block">
+            <HomeCategoryRail />
+          </aside>
+        ) : null}
         <HeroCarousel />
       </div>
 

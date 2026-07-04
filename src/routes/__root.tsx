@@ -11,6 +11,7 @@ import type { ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { CartProvider } from "@/lib/cart-store";
 import { WishlistProvider } from "@/lib/wishlist-store";
+import { CategoriesPanelProvider } from "@/lib/categories-panel";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Toaster } from "@/components/ui/sonner";
@@ -127,14 +128,16 @@ function RootComponent() {
   return (
     <CartProvider>
       <WishlistProvider>
-        <div className="flex min-h-screen flex-col bg-background">
-          <SiteHeader />
-          <main className="flex-1">
-            <Outlet />
-          </main>
-          <SiteFooter />
-          <Toaster position="bottom-center" />
-        </div>
+        <CategoriesPanelProvider>
+          <div className="flex min-h-screen flex-col bg-background">
+            <SiteHeader />
+            <main className="flex-1">
+              <Outlet />
+            </main>
+            <SiteFooter />
+            <Toaster position="bottom-center" />
+          </div>
+        </CategoriesPanelProvider>
       </WishlistProvider>
     </CartProvider>
   );

@@ -1,15 +1,6 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import {
-  LayoutGrid,
-  ChevronRight,
-  Leaf,
-  Wheat,
-  Egg,
-  Cookie,
-  Soup,
-  type LucideIcon,
-} from "lucide-react";
+import { ChevronRight, Leaf, Wheat, Egg, Cookie, Soup, type LucideIcon } from "lucide-react";
 import { categories, productsByCategory } from "@/lib/mock-data";
 
 const departmentIcons: Record<string, LucideIcon> = {
@@ -28,10 +19,6 @@ export function HomeCategoryRail() {
   return (
     <div className="relative" onMouseLeave={() => setActive(null)}>
       <nav className="overflow-hidden rounded-md border border-border bg-surface">
-        <div className="flex items-center gap-2 border-b border-border bg-muted/60 px-4 py-3 text-sm font-semibold text-foreground">
-          <LayoutGrid className="size-4 text-primary" />
-          All Categories
-        </div>
         <ul>
           {categories.map((c) => {
             const Icon = departmentIcons[c.id] ?? Leaf;

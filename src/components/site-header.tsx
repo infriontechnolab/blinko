@@ -1,10 +1,10 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { Search, ShoppingBag, MapPin, Heart, User, ChevronDown, Package, Menu } from "lucide-react";
+import { Search, ShoppingBag, MapPin, Heart, User, ChevronDown, Package, Menu, LayoutGrid } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useCart, formatPrice } from "@/lib/cart-store";
 import { useWishlist } from "@/lib/wishlist-store";
 import { CartDrawer } from "@/components/cart-drawer";
-import { CategoryMenu } from "@/components/category-menu";
+import { useCategoriesPanel } from "@/lib/categories-panel";
 import { categories } from "@/lib/mock-data";
 
 function useCountdown(targetHoursFromNow: number) {
@@ -42,6 +42,8 @@ export function SiteHeader() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const search = useRouterState({ select: (s) => s.location.search as { category?: string } });
   const cd = useCountdown(40 * 24 + 10);
+  const { open: catsOpen, toggle: toggleCats } = useCategoriesPanel();
+  const isHome = pathname === "/";
 
   const submitSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -212,7 +214,20 @@ export function SiteHeader() {
         <nav className="hidden border-t border-border bg-background md:block">
           <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-1.5">
             <div className="flex items-center gap-2">
-              <CategoryMenu />
+              {isHome ? (
+                <button
+                  onClick={toggleCats}
+                  aria-expanded={catsOpen}
+                  aria-controls="home-categories-panel"
+                  className="inline-flex w-60 items-center gap-2 rounded-md border border-border bg-surface px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-muted/60"
+                >
+                  <LayoutGrid className="size-4 text-primary" />
+                  All Categories
+                  <ChevronDown
+                    className={`ml-auto size-4 text-muted-foreground transition-transform ${catsOpen ? "rotate-180" : ""}`}
+                  />
+                </button>
+              ) : null}
               <ul className="flex items-center">
                 {catNav.map((c) => {
                   const active = isActive(c.to, c.search);
