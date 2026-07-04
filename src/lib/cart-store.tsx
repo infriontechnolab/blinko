@@ -1,7 +1,21 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 import { getProduct } from "./mock-data";
+import { usePersistentState } from "@/hooks/use-persistent-state";
 
 export type CartItem = { productId: string; qty: number };
+
+function isCartItems(value: unknown): value is CartItem[] {
+  return (
+    Array.isArray(value) &&
+    value.every(
+      (item): item is CartItem =>
+        !!item &&
+        typeof item === "object" &&
+        typeof (item as CartItem).productId === "string" &&
+        typeof (item as CartItem).qty === "number",
+    )
+  );
+}
 
 type CartContextValue = {
   items: CartItem[];
@@ -20,24 +34,8 @@ const CartContext = createContext<CartContextValue | null>(null);
 const KEY = "apna-mandi-cart-v1";
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>([]);
+  const [items, setItems] = usePersistentState<CartItem[]>(KEY, [], isCartItems);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [hydrated, setHydrated] = useState(false);
-
-  useEffect(() => {
-    try {
-      const raw = typeof window !== "undefined" ? window.localStorage.getItem(KEY) : null;
-      if (raw) setItems(JSON.parse(raw));
-    } catch {}
-    setHydrated(true);
-  }, []);
-
-  useEffect(() => {
-    if (!hydrated) return;
-    try {
-      window.localStorage.setItem(KEY, JSON.stringify(items));
-    } catch {}
-  }, [items, hydrated]);
 
   const add = useCallback((productId: string, qty = 1) => {
     setItems((prev) => {
@@ -75,17 +73,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
     return { count: c, subtotal: s };
   }, [items]);
 
-  const value: CartContextValue = {
-    items,
-    count,
-    subtotal,
-    add,
-    remove,
-    setQty,
-    clear,
-    drawerOpen,
-    setDrawerOpen,
-  };
+  const value = useMemo<CartContextValue>(
+    () => ({ items, count, subtotal, add, remove, setQty, clear, drawerOpen, setDrawerOpen }),
+    [items, count, subtotal, add, remove, setQty, clear, drawerOpen, setDrawerOpen],
+  );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

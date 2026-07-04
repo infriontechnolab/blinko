@@ -36,11 +36,31 @@ function Checkout() {
     pincode: "201309",
     phone: "+91 98765 43210",
   });
+  const [errors, setErrors] = useState<Partial<Record<keyof typeof address, string>>>({});
+
+  const setField = (key: keyof typeof address, v: string) => {
+    setAddress((a) => ({ ...a, [key]: v }));
+    setErrors((e) => (e[key] ? { ...e, [key]: undefined } : e));
+  };
+
+  const validate = () => {
+    const e: Partial<Record<keyof typeof address, string>> = {};
+    if (!address.name.trim()) e.name = "Enter a name";
+    const mobile = address.phone.replace(/\D/g, "").slice(-10);
+    if (mobile.length !== 10 || !/^[6-9]/.test(mobile)) e.phone = "Enter a valid 10-digit mobile";
+    if (!address.line1.trim()) e.line1 = "Enter an address";
+    if (!address.city.trim()) e.city = "Enter a city";
+    if (!/^\d{6}$/.test(address.pincode.trim())) e.pincode = "Enter a 6-digit pincode";
+    return e;
+  };
 
   const deliveryFee = subtotal >= 499 || subtotal === 0 ? 0 : 29;
   const total = subtotal + deliveryFee;
 
   const place = () => {
+    const e = validate();
+    setErrors(e);
+    if (Object.keys(e).length > 0) return;
     setPlacing(true);
     setTimeout(() => {
       clear();
@@ -90,12 +110,12 @@ function Checkout() {
               </div>
             </div>
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-              <Field label="Full name" value={address.name} onChange={(v) => setAddress({ ...address, name: v })} />
-              <Field label="Phone" value={address.phone} onChange={(v) => setAddress({ ...address, phone: v })} />
-              <Field label="Address line 1" value={address.line1} onChange={(v) => setAddress({ ...address, line1: v })} full />
-              <Field label="Address line 2" value={address.line2} onChange={(v) => setAddress({ ...address, line2: v })} full />
-              <Field label="City" value={address.city} onChange={(v) => setAddress({ ...address, city: v })} />
-              <Field label="Pincode" value={address.pincode} onChange={(v) => setAddress({ ...address, pincode: v })} />
+              <Field label="Full name" value={address.name} onChange={(v) => setField("name", v)} error={errors.name} />
+              <Field label="Phone" value={address.phone} onChange={(v) => setField("phone", v)} error={errors.phone} />
+              <Field label="Address line 1" value={address.line1} onChange={(v) => setField("line1", v)} error={errors.line1} full />
+              <Field label="Address line 2" value={address.line2} onChange={(v) => setField("line2", v)} full />
+              <Field label="City" value={address.city} onChange={(v) => setField("city", v)} error={errors.city} />
+              <Field label="Pincode" value={address.pincode} onChange={(v) => setField("pincode", v)} error={errors.pincode} />
             </div>
           </section>
 
@@ -233,11 +253,13 @@ function Field({
   label,
   value,
   onChange,
+  error,
   full,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
+  error?: string;
   full?: boolean;
 }) {
   return (
@@ -248,8 +270,14 @@ function Field({
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="h-10 rounded-md border border-border bg-background px-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/15"
+        aria-invalid={error ? true : undefined}
+        className={`h-10 rounded-md border bg-background px-3 text-sm outline-none focus:ring-2 ${
+          error
+            ? "border-sale focus:border-sale focus:ring-sale/15"
+            : "border-border focus:border-primary focus:ring-primary/15"
+        }`}
       />
+      {error ? <span className="text-[11px] font-medium text-sale">{error}</span> : null}
     </label>
   );
 }
