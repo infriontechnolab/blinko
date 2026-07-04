@@ -19,8 +19,8 @@ export function HomeCategoryRail() {
 
   return (
     <div className="relative" onMouseLeave={() => setActive(null)}>
-      <nav className="overflow-hidden rounded-2xl border border-border bg-surface">
-        <p className="border-b border-border bg-muted/50 px-4 py-3 font-mono text-[11px] font-semibold uppercase tracking-widest text-foreground">
+      <nav className="overflow-hidden rounded-xl border border-border bg-surface">
+        <p className="border-b border-border px-4 py-3 text-sm font-semibold text-foreground">
           Shop by department
         </p>
         <ul>
@@ -38,12 +38,7 @@ export function HomeCategoryRail() {
                     isActive ? "bg-muted text-primary" : "text-foreground hover:bg-muted/60"
                   }`}
                 >
-                  <span
-                    className="grid size-8 shrink-0 place-items-center rounded-lg text-foreground/70"
-                    style={{ backgroundColor: c.tint }}
-                  >
-                    <Icon className="size-4" />
-                  </span>
+                  <Icon className="size-4 shrink-0 text-muted-foreground" />
                   <span className="flex-1 font-medium">{c.name}</span>
                   <ChevronRight className="size-4 text-muted-foreground/50" />
                 </Link>
@@ -58,10 +53,8 @@ export function HomeCategoryRail() {
         <div className="absolute left-full top-0 z-40 ml-2 hidden w-[380px] rounded-2xl border border-border bg-surface p-4 shadow-xl lg:block">
           <div className="mb-3 flex items-baseline justify-between">
             <div>
-              <p className="font-heading text-base font-bold text-foreground">{activeCategory.name}</p>
-              <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                {activeCategory.tagline}
-              </p>
+              <p className="text-base font-bold text-foreground">{activeCategory.name}</p>
+              <p className="text-xs text-muted-foreground">{activeCategory.tagline}</p>
             </div>
             <Link
               to="/browse"

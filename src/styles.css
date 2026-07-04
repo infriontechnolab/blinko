@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-heading: "Baloo 2", system-ui, sans-serif;
+  --font-heading: "Work Sans", system-ui, sans-serif;
   --font-body: "Work Sans", system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
 
@@ -45,40 +45,42 @@
 }
 
 :root {
-  --background: oklch(0.99 0.005 90);
-  --foreground: oklch(0.18 0.015 60);
+  /* Minimalist: neutral greys, white surfaces, generous whitespace.
+     Colour is reserved for function — purple actions, red sale, green stock. */
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.22 0 0);
   --surface: oklch(1 0 0);
-  --ink: oklch(0.18 0.015 60);
-  --muted: oklch(0.965 0.008 80);
-  --muted-foreground: oklch(0.5 0.02 60);
-  --border: oklch(0.92 0.01 80);
-  --input: oklch(0.92 0.01 80);
-  --ring: oklch(0.5 0.18 295);
+  --ink: oklch(0.2 0 0);
+  --muted: oklch(0.972 0 0);
+  --muted-foreground: oklch(0.53 0 0);
+  --border: oklch(0.915 0 0);
+  --input: oklch(0.915 0 0);
+  --ring: oklch(0.44 0.18 295);
 
-  /* Primary: deep grocery-purple (Grogin-inspired) */
-  --primary: oklch(0.44 0.18 295);
-  --primary-foreground: oklch(0.99 0.005 90);
-  /* Accent: fresh green (CTA / add-to-cart / in-stock) */
+  /* Primary: purple — links and primary actions only */
+  --primary: oklch(0.45 0.16 292);
+  --primary-foreground: oklch(1 0 0);
+  /* Accent: green — in-stock / add-to-cart */
   --accent: oklch(0.62 0.17 145);
-  --accent-foreground: oklch(0.99 0.005 90);
-  /* Success = accent alias */
+  --accent-foreground: oklch(1 0 0);
   --success: oklch(0.62 0.17 145);
-  --success-foreground: oklch(0.99 0.005 90);
-  /* Sale/discount */
-  --sale: oklch(0.62 0.22 25);
-  --sale-foreground: oklch(0.99 0.005 90);
+  --success-foreground: oklch(1 0 0);
+  /* Sale/discount red */
+  --sale: oklch(0.6 0.22 25);
+  --sale-foreground: oklch(1 0 0);
 
-  --kraft: oklch(0.94 0.03 75);
-  --kraft-dark: oklch(0.7 0.08 65);
+  /* Retained token names, repurposed to neutral greys. */
+  --kraft: oklch(0.972 0 0);
+  --kraft-dark: oklch(0.52 0 0);
 
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0.015 60);
+  --card-foreground: oklch(0.22 0 0);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0.015 60);
-  --secondary: oklch(0.965 0.008 80);
-  --secondary-foreground: oklch(0.18 0.015 60);
+  --popover-foreground: oklch(0.22 0 0);
+  --secondary: oklch(0.972 0 0);
+  --secondary-foreground: oklch(0.22 0 0);
   --destructive: oklch(0.58 0.22 27);
-  --destructive-foreground: oklch(0.99 0.005 90);
+  --destructive-foreground: oklch(1 0 0);
 }
 
 @layer base {
@@ -89,6 +91,6 @@
     font-family: var(--font-body);
     -webkit-font-smoothing: antialiased;
   }
-  h1, h2, h3, h4, h5 { font-family: var(--font-heading); letter-spacing: -0.01em; }
+  h1, h2, h3, h4, h5 { font-family: var(--font-heading); letter-spacing: -0.02em; font-weight: 700; }
   .font-mono, code, kbd, samp, pre { font-family: var(--font-mono); }
 }

@@ -37,9 +37,7 @@ function Index() {
             </div>
             <div>
               <p className="text-sm font-semibold">{label}</p>
-              <p className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
-                {note}
-              </p>
+              <p className="text-xs text-muted-foreground">{note}</p>
             </div>
           </div>
         ))}
@@ -48,12 +46,7 @@ function Index() {
       {/* Categories */}
       <section className="mt-14">
         <div className="mb-6 flex items-end justify-between">
-          <div>
-            <p className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
-              01 · Departments
-            </p>
-            <h2 className="mt-1 font-heading text-3xl font-bold">Shop by aisle</h2>
-          </div>
+          <h2 className="text-2xl font-bold">Shop by aisle</h2>
           <Link to="/browse" className="text-sm font-semibold text-primary hover:underline">
             View all
           </Link>
@@ -64,23 +57,16 @@ function Index() {
               key={c.id}
               to="/browse"
               search={{ category: c.id }}
-              className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-surface transition-all hover:-translate-y-0.5 hover:shadow-md"
+              className="group flex flex-col overflow-hidden rounded-xl border border-border bg-surface transition-colors hover:border-primary/40"
             >
-              <div
-                className="aspect-[4/3] w-full"
-                style={{ backgroundColor: c.tint }}
-              >
-                <div className="flex h-full items-end p-4">
-                  <span className="font-heading text-2xl font-bold leading-none text-foreground">
-                    {c.name.split(" ")[0]}
-                  </span>
-                </div>
+              <div className="flex aspect-[4/3] w-full items-end bg-muted p-4">
+                <span className="text-xl font-bold leading-none text-foreground">
+                  {c.name.split(" ")[0]}
+                </span>
               </div>
               <div className="p-4">
                 <p className="text-sm font-semibold">{c.name}</p>
-                <p className="mt-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                  {c.tagline}
-                </p>
+                <p className="mt-1 text-xs text-muted-foreground">{c.tagline}</p>
               </div>
             </Link>
           ))}
@@ -89,13 +75,8 @@ function Index() {
 
       {/* Featured shelf */}
       <section className="mt-14">
-        <div className="mb-6 flex items-end justify-between">
-          <div>
-            <p className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
-              02 · Picked for you
-            </p>
-            <h2 className="mt-1 font-heading text-3xl font-bold">This week's shelf</h2>
-          </div>
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold">This week's shelf</h2>
         </div>
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           {featured.map((p) => (
@@ -107,10 +88,8 @@ function Index() {
       {/* Split promo */}
       <section className="mt-14 grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="rounded-2xl border border-border bg-ink p-8 text-background">
-          <p className="font-mono text-[11px] uppercase tracking-widest text-background/60">
-            Ready-to-eat
-          </p>
-          <h3 className="mt-3 font-heading text-3xl font-bold">Kitchen off. Meal on.</h3>
+          <p className="text-xs text-background/60">Ready-to-eat</p>
+          <h3 className="mt-2 text-2xl font-bold">Kitchen off. Meal on.</h3>
           <p className="mt-3 max-w-sm text-sm text-background/70">
             Slow-cooked classics packed at 4pm, at your door by 7.
           </p>
@@ -122,11 +101,9 @@ function Index() {
             Shop ready meals <ArrowRight className="size-4" />
           </Link>
         </div>
-        <div className="rounded-2xl border border-border bg-kraft p-8">
-          <p className="font-mono text-[11px] uppercase tracking-widest text-kraft-dark">
-            Pantry
-          </p>
-          <h3 className="mt-3 font-heading text-3xl font-bold">Restock the essentials.</h3>
+        <div className="rounded-2xl border border-border bg-muted p-8">
+          <p className="text-xs text-muted-foreground">Pantry</p>
+          <h3 className="mt-2 text-2xl font-bold">Restock the essentials.</h3>
           <p className="mt-3 max-w-sm text-sm text-foreground/70">
             Rice, oil, dals and grains — the everyday things, sorted.
           </p>
@@ -142,13 +119,8 @@ function Index() {
 
       {/* Pantry shelf */}
       <section className="mt-14">
-        <div className="mb-6 flex items-end justify-between">
-          <div>
-            <p className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
-              03 · Pantry
-            </p>
-            <h2 className="mt-1 font-heading text-3xl font-bold">Everyday essentials</h2>
-          </div>
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold">Everyday essentials</h2>
         </div>
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           {pantry.map((p) => (

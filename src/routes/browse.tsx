@@ -222,21 +222,20 @@ function Browse() {
         {/* Right column */}
         <div>
           {/* Promo strip */}
-          <div className="relative mb-4 overflow-hidden rounded-xl bg-gradient-to-r from-[#fff7d6] to-[#ffe1a8] p-6">
-            <p className="font-mono text-[10px] uppercase tracking-widest text-sale">Only this week</p>
-            <h2 className="mt-1 font-heading text-2xl font-bold md:text-3xl">
+          <div className="relative mb-4 overflow-hidden rounded-xl bg-muted p-6">
+            <p className="text-xs font-medium text-sale">Only this week</p>
+            <h2 className="mt-1 text-2xl font-bold md:text-3xl">
               Grocery store with different treasures
             </h2>
-            <p className="mt-1 max-w-md text-sm text-foreground/70">
+            <p className="mt-1 max-w-md text-sm text-muted-foreground">
               We have prepared special discounts for you on grocery products…
             </p>
             <Link
               to="/browse"
-              className="mt-4 inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-2 text-xs font-bold uppercase tracking-wider text-background"
+              className="mt-4 inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
             >
-              Shop Now →
+              Shop now →
             </Link>
-            <div className="pointer-events-none absolute -right-6 top-1/2 hidden aspect-square w-56 -translate-y-1/2 rotate-6 rounded-full bg-white/40 md:block" />
           </div>
 
           {/* Toolbar */}

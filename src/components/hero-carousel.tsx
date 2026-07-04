@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
-import { categories, getProduct } from "@/lib/mock-data";
+import { getProduct } from "@/lib/mock-data";
 import { formatPrice } from "@/lib/cart-store";
 
 type Slide = {
@@ -17,9 +17,6 @@ const SLIDES: Slide[] = [
   { categoryId: "produce", eyebrow: "Fresh this week", title: "Ripe, ready, at your door in minutes", productId: "am-avocado" },
   { categoryId: "pantry", eyebrow: "Pantry restock", title: "Two-year aged basmati and staples", productId: "am-rice" },
 ];
-
-const tintOf = (categoryId: string) =>
-  categories.find((c) => c.id === categoryId)?.tint ?? "oklch(0.94 0.03 75)";
 
 export function HeroCarousel() {
   const [active, setActive] = useState(0);
@@ -42,40 +39,36 @@ export function HeroCarousel() {
 
   const slide = SLIDES[active];
   const product = getProduct(slide.productId)!;
-  const tint = tintOf(slide.categoryId);
 
   return (
     <section
-      className="relative overflow-hidden rounded-3xl border border-border bg-surface"
+      className="relative overflow-hidden rounded-2xl bg-muted"
       onMouseEnter={() => (paused.current = true)}
       onMouseLeave={() => (paused.current = false)}
       aria-roledescription="carousel"
       aria-label="Featured departments"
     >
-      <div className="grid grid-cols-1 items-center gap-6 p-7 md:min-h-[400px] md:grid-cols-2 md:gap-4 md:p-10">
+      <div className="grid grid-cols-1 items-center gap-6 p-7 md:min-h-[380px] md:grid-cols-2 md:gap-4 md:p-12">
         {/* Copy */}
-        <div key={`copy-${active}`} className="animate-in fade-in slide-in-from-bottom-2 duration-500 md:pr-4">
-          <span
-            className="inline-flex items-center rounded-full px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-foreground/80"
-            style={{ backgroundColor: tint }}
-          >
+        <div key={`copy-${active}`} className="animate-in fade-in duration-500 md:pr-4">
+          <span className="inline-flex items-center rounded-full bg-surface px-3 py-1 text-[11px] font-medium text-muted-foreground">
             {slide.eyebrow}
           </span>
-          <h1 className="mt-4 text-balance font-heading text-3xl font-bold leading-[1.05] text-foreground md:text-5xl">
+          <h1 className="mt-4 text-balance text-3xl font-bold leading-[1.1] text-foreground md:text-4xl">
             {slide.title}
           </h1>
-          <div className="mt-5 flex flex-wrap items-center gap-4">
+          <div className="mt-6 flex flex-wrap items-center gap-4">
             <Link
               to="/browse"
               search={{ category: slide.categoryId }}
-              className="inline-flex items-center gap-2 rounded-lg bg-ink px-5 py-3 text-sm font-semibold text-background transition-transform hover:-translate-y-px"
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
             >
               Shop now <ArrowRight className="size-4" />
             </Link>
             <p className="flex items-baseline gap-2">
-              <span className="font-mono text-2xl font-bold text-sale">{formatPrice(product.price)}</span>
+              <span className="text-xl font-bold text-sale">{formatPrice(product.price)}</span>
               {product.compareAtPrice ? (
-                <span className="font-mono text-sm text-muted-foreground line-through">
+                <span className="text-sm text-muted-foreground line-through">
                   {formatPrice(product.compareAtPrice)}
                 </span>
               ) : null}
@@ -84,21 +77,15 @@ export function HeroCarousel() {
         </div>
 
         {/* Product image */}
-        <div className="relative">
-          <div
-            key={`img-${active}`}
-            className="relative mx-auto aspect-[5/4] w-full max-w-md animate-in fade-in slide-in-from-right-4 duration-500"
-          >
-            <div className="absolute inset-0 rounded-2xl" style={{ backgroundColor: tint }} />
-            <img
-              src={product.image}
-              alt={product.name}
-              className="absolute inset-2 size-[calc(100%-1rem)] rounded-xl object-cover shadow-lg"
-            />
-            <div className="absolute bottom-3 left-3 rounded-lg bg-background/95 px-3 py-1.5 shadow-md backdrop-blur">
-              <p className="font-heading text-sm font-bold leading-tight text-foreground">{product.name}</p>
-            </div>
-          </div>
+        <div
+          key={`img-${active}`}
+          className="relative mx-auto aspect-[5/4] w-full max-w-sm animate-in fade-in duration-500"
+        >
+          <img
+            src={product.image}
+            alt={product.name}
+            className="size-full rounded-xl object-cover"
+          />
         </div>
       </div>
 

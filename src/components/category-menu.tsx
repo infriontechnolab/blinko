@@ -71,19 +71,14 @@ export function CategoryMenu() {
                 role="menuitem"
                 className="group flex items-center gap-3 rounded-xl px-2.5 py-2.5 transition-colors hover:bg-muted"
               >
-                <span
-                  className="grid size-9 shrink-0 place-items-center rounded-lg text-foreground/70"
-                  style={{ backgroundColor: c.tint }}
-                >
+                <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-muted text-muted-foreground">
                   <Icon className="size-4" />
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block text-sm font-semibold text-foreground group-hover:text-primary">
                     {c.name}
                   </span>
-                  <span className="block font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                    {c.tagline}
-                  </span>
+                  <span className="block text-xs text-muted-foreground">{c.tagline}</span>
                 </span>
                 <ChevronRight className="size-4 shrink-0 text-muted-foreground/50 transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
               </Link>
