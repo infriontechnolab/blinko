@@ -178,28 +178,38 @@ export function ProductCard({
             In stock · ready to ship
           </p>
         )}
-        {/* Quantity stepper — mt-auto keeps it pinned to the card base */}
+        {/* Add-to-cart / quantity stepper — mt-auto keeps it pinned to the card base */}
         {product.inStock ? (
-          <div className="mt-auto flex items-center justify-between rounded-full border border-border p-1">
-            <button
-              onClick={dec}
-              disabled={cartQty <= 0}
-              aria-label="Decrease quantity"
-              className="grid size-8 place-items-center rounded-full text-foreground transition-colors hover:bg-muted disabled:opacity-40 disabled:hover:bg-transparent"
-            >
-              <Minus className="size-4" />
-            </button>
-            <span className="min-w-6 text-center font-mono text-sm font-semibold">
-              {cartQty}
-            </span>
+          cartQty > 0 ? (
+            <div className="mt-auto flex items-center justify-between rounded-full border border-border p-1">
+              <button
+                onClick={dec}
+                aria-label="Decrease quantity"
+                className="grid size-8 place-items-center rounded-full text-foreground transition-colors hover:bg-muted"
+              >
+                <Minus className="size-4" />
+              </button>
+              <span className="min-w-6 text-center font-mono text-sm font-semibold">
+                {cartQty}
+              </span>
+              <button
+                onClick={inc}
+                aria-label="Increase quantity"
+                className="grid size-8 place-items-center rounded-full bg-primary text-primary-foreground transition-opacity hover:opacity-90"
+              >
+                <Plus className="size-4" />
+              </button>
+            </div>
+          ) : (
             <button
               onClick={inc}
               aria-label="Add to cart"
-              className="grid size-8 place-items-center rounded-full bg-primary text-primary-foreground transition-opacity hover:opacity-90"
+              className="mt-auto flex items-center justify-center gap-1.5 rounded-full bg-primary py-2 text-xs font-semibold text-primary-foreground transition-opacity hover:opacity-90"
             >
               <Plus className="size-4" />
+              Add to cart
             </button>
-          </div>
+          )
         ) : (
           <p className="mt-auto rounded-full bg-muted py-2 text-center text-xs font-semibold text-muted-foreground">
             Out of stock
