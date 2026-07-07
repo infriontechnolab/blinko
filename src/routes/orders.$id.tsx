@@ -1,28 +1,57 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { z } from "zod";
 import { CheckCircle2, MapPin, Clock, Phone, ArrowLeft } from "lucide-react";
 import { pastOrders, getProduct, type Order } from "@/lib/mock-data";
 import { formatPrice } from "@/lib/cart-store";
+import { useOrders, useNow, hydrateOrder } from "@/lib/orders-store";
 import { OrderTracker } from "@/components/order-tracker";
+import { BRAND } from "@/lib/brand";
 
 const search = z.object({ just_placed: z.coerce.number().optional() });
 
 export const Route = createFileRoute("/orders/$id")({
   validateSearch: search,
-  loader: ({ params }) => {
-    const order = pastOrders.find((o) => o.id === params.id);
-    if (!order) throw notFound();
-    return { order };
-  },
   head: ({ params }) => ({
-    meta: [{ title: `Order #${params.id} — Apna Mandi` }],
+    meta: [{ title: `Order #${params.id} — ${BRAND.name}` }],
   }),
   component: OrderDetail,
 });
 
 function OrderDetail() {
-  const { order } = Route.useLoaderData();
+  const { id } = Route.useParams();
   const { just_placed } = Route.useSearch();
+  const { getStored } = useOrders();
+  const now = useNow(1000);
+
+  // Resolve a freshly placed order (client-only, live status) first, then fall
+  // back to the static demo history. now === 0 means not yet mounted.
+  const stored = getStored(id);
+  const order: Order | undefined = stored
+    ? hydrateOrder(stored, now || Date.now())
+    : pastOrders.find((o) => o.id === id);
+
+  if (!order) {
+    return (
+      <div className="mx-auto max-w-2xl px-4 py-24 text-center">
+        <h1 className="font-heading text-3xl font-bold">
+          {now === 0 ? "Loading order…" : "Order not found"}
+        </h1>
+        {now !== 0 ? (
+          <>
+            <p className="mt-2 text-sm text-muted-foreground">
+              We couldn't find order #{id}. It may have expired.
+            </p>
+            <Link
+              to="/orders"
+              className="mt-6 inline-block rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground"
+            >
+              View your orders
+            </Link>
+          </>
+        ) : null}
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 md:py-10">
@@ -39,7 +68,7 @@ function OrderDetail() {
           <div>
             <p className="font-heading text-lg font-bold text-primary">Order placed</p>
             <p className="mt-0.5 text-sm text-foreground/80">
-              Apna Mandi is packing your basket now. You'll see live updates below.
+              {BRAND.name} is packing your basket now. You'll see live updates below.
             </p>
           </div>
         </div>
@@ -59,7 +88,7 @@ function OrderDetail() {
           </h1>
           <p className="mt-1 font-mono text-xs text-muted-foreground">
             Placed{" "}
-            {new Date(order.placedAt).toLocaleString("en-IN", {
+            {new Date(order.placedAt).toLocaleString("en-US", {
               dateStyle: "medium",
               timeStyle: "short",
             })}
@@ -98,7 +127,7 @@ function OrderDetail() {
               <p className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
                 Delivery partner
               </p>
-              <p className="font-semibold">Apna Mandi Rider · +91 ••••• ••210</p>
+              <p className="font-semibold">{BRAND.name} Rider · +91 ••••• ••210</p>
             </div>
           </div>
         </section>
@@ -116,17 +145,27 @@ function OrderDetail() {
             </div>
           </div>
           <ol className="mt-4 space-y-3 text-sm">
-            <TimelineRow label="Order placed" time="10:12 AM" done />
-            <TimelineRow label="Packed" time="10:24 AM" done={order.status !== "placed"} />
+            <TimelineRow label="Order placed" time={clockAt(order.placedAt, 0)} done />
+            <TimelineRow
+              label="Packed"
+              time={clockAt(order.placedAt, 1)}
+              done={order.status !== "placed"}
+            />
             <TimelineRow
               label="Out for delivery"
-              time={order.status === "out_for_delivery" ? "Now" : "10:38 AM"}
+              time={order.status === "out_for_delivery" ? "Now" : clockAt(order.placedAt, 3)}
               done={order.status === "out_for_delivery" || order.status === "delivered"}
               active={order.status === "out_for_delivery"}
             />
             <TimelineRow
               label="Delivered"
-              time={order.etaMinutes ? `ETA ${order.etaMinutes}m` : order.status === "delivered" ? "11:04 AM" : "—"}
+              time={
+                order.etaMinutes
+                  ? `ETA ${order.etaMinutes}m`
+                  : order.status === "delivered"
+                    ? clockAt(order.placedAt, 8)
+                    : "—"
+              }
               done={order.status === "delivered"}
             />
           </ol>
@@ -170,6 +209,14 @@ function OrderDetail() {
       </section>
     </div>
   );
+}
+
+/** Wall-clock label `minsAfter` minutes past the placed time (e.g. "10:24 AM"). */
+function clockAt(placedAt: string, minsAfter: number): string {
+  return new Date(new Date(placedAt).getTime() + minsAfter * 60_000).toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+  });
 }
 
 function TimelineRow({

@@ -11,7 +11,9 @@ import type { ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { CartProvider } from "@/lib/cart-store";
 import { WishlistProvider } from "@/lib/wishlist-store";
+import { OrdersProvider } from "@/lib/orders-store";
 import { CategoriesPanelProvider } from "@/lib/categories-panel";
+import { BRAND } from "@/lib/brand";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Toaster } from "@/components/ui/sonner";
@@ -30,7 +32,7 @@ function NotFoundComponent() {
             to="/"
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:opacity-90"
           >
-            Back to Apna Mandi
+            Back to {BRAND.name}
           </Link>
         </div>
       </div>
@@ -45,9 +47,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          Something spilled
-        </h1>
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">Something spilled</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           We hit a snag loading this page. Try again or head home.
         </p>
@@ -78,13 +78,13 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Apna Mandi — Groceries, delivered under one promise" },
+      { title: `${BRAND.name} — Groceries, delivered under one promise` },
       {
         name: "description",
         content:
           "Fresh produce, pantry staples, dairy and everyday essentials — one unified store, one standard, delivered fast.",
       },
-      { property: "og:title", content: "Apna Mandi — Groceries, delivered under one promise" },
+      { property: "og:title", content: `${BRAND.name} — Groceries, delivered under one promise` },
       {
         property: "og:description",
         content:
@@ -128,16 +128,18 @@ function RootComponent() {
   return (
     <CartProvider>
       <WishlistProvider>
-        <CategoriesPanelProvider>
-          <div className="flex min-h-screen flex-col bg-background">
-            <SiteHeader />
-            <main className="flex-1">
-              <Outlet />
-            </main>
-            <SiteFooter />
-            <Toaster position="bottom-center" />
-          </div>
-        </CategoriesPanelProvider>
+        <OrdersProvider>
+          <CategoriesPanelProvider>
+            <div className="flex min-h-screen flex-col bg-background">
+              <SiteHeader />
+              <main className="flex-1">
+                <Outlet />
+              </main>
+              <SiteFooter />
+              <Toaster position="bottom-center" />
+            </div>
+          </CategoriesPanelProvider>
+        </OrdersProvider>
       </WishlistProvider>
     </CartProvider>
   );

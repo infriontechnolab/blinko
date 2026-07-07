@@ -2,9 +2,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 import { useCart, formatPrice } from "@/lib/cart-store";
 import { getProduct } from "@/lib/mock-data";
+import { BRAND } from "@/lib/brand";
 
 export const Route = createFileRoute("/cart")({
-  head: () => ({ meta: [{ title: "Your basket — Apna Mandi" }] }),
+  head: () => ({ meta: [{ title: `Your basket — ${BRAND.name}` }] }),
   component: CartPage,
 });
 
@@ -62,7 +63,7 @@ function CartPage() {
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                        Apna Mandi
+                        {BRAND.name}
                       </p>
                       <Link
                         to="/products/$id"

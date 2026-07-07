@@ -2,10 +2,12 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Check, CreditCard, MapPin, Clock } from "lucide-react";
 import { useCart, formatPrice } from "@/lib/cart-store";
+import { useOrders, newOrderId } from "@/lib/orders-store";
 import { getProduct } from "@/lib/mock-data";
+import { BRAND } from "@/lib/brand";
 
 export const Route = createFileRoute("/checkout")({
-  head: () => ({ meta: [{ title: "Checkout — Apna Mandi" }] }),
+  head: () => ({ meta: [{ title: `Checkout — ${BRAND.name}` }] }),
   component: Checkout,
 });
 
@@ -25,6 +27,7 @@ const payments = [
 function Checkout() {
   const navigate = useNavigate();
   const { items, subtotal, clear } = useCart();
+  const { place: placeOrder } = useOrders();
   const [slot, setSlot] = useState("s1");
   const [payment, setPayment] = useState("upi");
   const [placing, setPlacing] = useState(false);
@@ -62,9 +65,30 @@ function Checkout() {
     setErrors(e);
     if (Object.keys(e).length > 0) return;
     setPlacing(true);
+
+    // Snapshot the real basket into a stored order — this is what the tracker
+    // and order history read back, in place of the old hardcoded AM-9402.
+    const id = newOrderId();
+    const orderItems = items
+      .map((it) => {
+        const p = getProduct(it.productId);
+        return p ? { productId: it.productId, qty: it.qty, price: p.price } : null;
+      })
+      .filter((x): x is { productId: string; qty: number; price: number } => x !== null);
+
+    placeOrder({
+      id,
+      placedAt: new Date().toISOString(),
+      items: orderItems,
+      subtotal,
+      delivery: deliveryFee,
+      total,
+      address: `${address.line1}, ${address.city}, ${address.pincode}`,
+    });
+
     setTimeout(() => {
       clear();
-      navigate({ to: "/orders/$id", params: { id: "AM-9402" }, search: { just_placed: 1 } });
+      navigate({ to: "/orders/$id", params: { id }, search: { just_placed: 1 } });
     }, 900);
   };
 
@@ -110,12 +134,43 @@ function Checkout() {
               </div>
             </div>
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-              <Field label="Full name" value={address.name} onChange={(v) => setField("name", v)} error={errors.name} />
-              <Field label="Phone" value={address.phone} onChange={(v) => setField("phone", v)} error={errors.phone} />
-              <Field label="Address line 1" value={address.line1} onChange={(v) => setField("line1", v)} error={errors.line1} full />
-              <Field label="Address line 2" value={address.line2} onChange={(v) => setField("line2", v)} full />
-              <Field label="City" value={address.city} onChange={(v) => setField("city", v)} error={errors.city} />
-              <Field label="Pincode" value={address.pincode} onChange={(v) => setField("pincode", v)} error={errors.pincode} />
+              <Field
+                label="Full name"
+                value={address.name}
+                onChange={(v) => setField("name", v)}
+                error={errors.name}
+              />
+              <Field
+                label="Phone"
+                value={address.phone}
+                onChange={(v) => setField("phone", v)}
+                error={errors.phone}
+              />
+              <Field
+                label="Address line 1"
+                value={address.line1}
+                onChange={(v) => setField("line1", v)}
+                error={errors.line1}
+                full
+              />
+              <Field
+                label="Address line 2"
+                value={address.line2}
+                onChange={(v) => setField("line2", v)}
+                full
+              />
+              <Field
+                label="City"
+                value={address.city}
+                onChange={(v) => setField("city", v)}
+                error={errors.city}
+              />
+              <Field
+                label="Pincode"
+                value={address.pincode}
+                onChange={(v) => setField("pincode", v)}
+                error={errors.pincode}
+              />
             </div>
           </section>
 
@@ -241,7 +296,7 @@ function Checkout() {
             {placing ? "Placing order…" : `Place order · ${formatPrice(total)}`}
           </button>
           <p className="mt-3 text-center font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-            One store · One promise · Apna Mandi
+            One store · One promise · {BRAND.name}
           </p>
         </aside>
       </div>

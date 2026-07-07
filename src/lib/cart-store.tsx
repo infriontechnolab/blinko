@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 import { getProduct } from "./mock-data";
+import { CURRENCY } from "./brand";
 import { usePersistentState } from "@/hooks/use-persistent-state";
 
 export type CartItem = { productId: string; qty: number };
@@ -31,7 +32,7 @@ type CartContextValue = {
 
 const CartContext = createContext<CartContextValue | null>(null);
 
-const KEY = "apna-mandi-cart-v1";
+const KEY = "cartelo-cart-v1";
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = usePersistentState<CartItem[]>(KEY, [], isCartItems);
@@ -88,5 +89,8 @@ export function useCart() {
 }
 
 export function formatPrice(n: number) {
-  return `₹${n.toLocaleString("en-IN")}`;
+  return `${CURRENCY.symbol}${(n * CURRENCY.inrRate).toLocaleString(CURRENCY.locale, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
 }

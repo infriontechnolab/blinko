@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { z } from "zod";
 import { ChevronLeft, ChevronRight, LayoutGrid, List, Plus, Minus, SlidersHorizontal, X } from "lucide-react";
 import { ProductCard } from "@/components/product-card";
+import { formatPrice } from "@/lib/cart-store";
 import { brands, categories, productColors, products } from "@/lib/mock-data";
 
 const search = z.object({
@@ -18,6 +19,16 @@ export const Route = createFileRoute("/browse")({
 });
 
 const PAGE_SIZE = 12;
+
+// Facet counts derived from the actual catalog so the badges never drift out of
+// sync and zero-product options (e.g. an unstocked color) don't render as dead
+// filters that return nothing.
+const brandFacets = brands
+  .map((b) => ({ ...b, count: products.filter((p) => p.brandId === b.id).length }))
+  .filter((b) => b.count > 0);
+const colorFacets = productColors
+  .map((c) => ({ ...c, count: products.filter((p) => p.color === c.id).length }))
+  .filter((c) => c.count > 0);
 
 function Browse() {
   const { category, q, page, sale } = Route.useSearch();
@@ -137,7 +148,7 @@ function Browse() {
               <p className="text-xs">
                 Price:{" "}
                 <span className="font-mono font-semibold">
-                  ₹{priceMin} — ₹{priceMax}
+                  {formatPrice(priceMin)} — {formatPrice(priceMax)}
                 </span>
               </p>
               <button className="rounded bg-foreground px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-background">
@@ -197,7 +208,7 @@ function Browse() {
           {/* Colors */}
           <FilterBlock title="Filter by Color">
             <ul className="space-y-2">
-              {productColors.map((c) => {
+              {colorFacets.map((c) => {
                 const active = selectedColors.includes(c.id);
                 return (
                   <li key={c.id}>
@@ -225,7 +236,7 @@ function Browse() {
           {/* Brands */}
           <FilterBlock title="Filter by Brands">
             <ul className="space-y-2">
-              {brands.map((b) => {
+              {brandFacets.map((b) => {
                 const active = selectedBrands.includes(b.id);
                 return (
                   <li key={b.id} className="flex items-center justify-between text-sm">

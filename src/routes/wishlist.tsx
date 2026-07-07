@@ -3,9 +3,10 @@ import { Heart } from "lucide-react";
 import { useWishlist } from "@/lib/wishlist-store";
 import { getProduct, type Product } from "@/lib/mock-data";
 import { ProductCard } from "@/components/product-card";
+import { BRAND } from "@/lib/brand";
 
 export const Route = createFileRoute("/wishlist")({
-  head: () => ({ meta: [{ title: "Wishlist — Apna Mandi" }] }),
+  head: () => ({ meta: [{ title: `Wishlist — ${BRAND.name}` }] }),
   component: Wishlist,
 });
 

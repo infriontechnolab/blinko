@@ -30,3 +30,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+demo/
+
+# Secrets
+.env
+
+# Local tooling / artifacts
+CLAUDE.md
+demo-video/

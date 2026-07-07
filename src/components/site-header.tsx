@@ -8,6 +8,7 @@ import { LocationPicker } from "@/components/location-picker";
 import { usePersistentState } from "@/hooks/use-persistent-state";
 import { useCategoriesPanel } from "@/lib/categories-panel";
 import { categories, products } from "@/lib/mock-data";
+import { BRAND } from "@/lib/brand";
 
 const isString = (v: unknown): v is string => typeof v === "string";
 const trendingProducts = [...products].sort((a, b) => b.rating - a.rating).slice(0, 5);
@@ -45,7 +46,7 @@ export function SiteHeader() {
   const [mobileNav, setMobileNav] = useState(false);
   const [searchFocus, setSearchFocus] = useState(false);
   const [mobileCat, setMobileCat] = useState<string | null>(null);
-  const [location, setLocation] = usePersistentState<string>("apna-mandi-location", "Noida 62", isString);
+  const [location, setLocation] = usePersistentState<string>("cartelo-location", "Noida 62", isString);
   const [locOpen, setLocOpen] = useState(false);
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -115,7 +116,7 @@ export function SiteHeader() {
               English <ChevronDown className="size-3" />
             </button>
             <button className="inline-flex items-center gap-1 hover:text-primary">
-              INR <ChevronDown className="size-3" />
+              USD <ChevronDown className="size-3" />
             </button>
             <Link to="/orders" className="inline-flex items-center gap-1 hover:text-primary">
               <Package className="size-3.5" /> Order Tracking
@@ -140,8 +141,8 @@ export function SiteHeader() {
               <ShoppingBasket className="size-5" />
             </span>
             <span className="text-2xl font-extrabold leading-none tracking-tight">
-              <span className="text-foreground">Apna</span>
-              <span className="text-primary">Mandi</span>
+              <span className="text-foreground">{BRAND.wordmarkPrefix}</span>
+              <span className="text-primary">{BRAND.wordmarkSuffix}</span>
             </span>
           </Link>
 

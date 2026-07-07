@@ -20,6 +20,7 @@ import { useCart, formatPrice } from "@/lib/cart-store";
 import { useWishlist } from "@/lib/wishlist-store";
 import { ProductCard } from "@/components/product-card";
 import { ProductDetailSkeleton } from "@/components/skeletons";
+import { BRAND } from "@/lib/brand";
 
 // Deterministic sample reviews (static demo — no backend).
 const SAMPLE_REVIEWS = [
@@ -52,10 +53,10 @@ export const Route = createFileRoute("/products/$id")({
   head: ({ loaderData }) => ({
     meta: loaderData
       ? [
-          { title: `${loaderData.product.name} — Apna Mandi` },
+          { title: `${loaderData.product.name} — ${BRAND.name}` },
           { name: "description", content: loaderData.product.description },
         ]
-      : [{ title: "Product — Apna Mandi" }],
+      : [{ title: `Product — ${BRAND.name}` }],
   }),
   component: PDP,
   pendingComponent: ProductDetailSkeleton,
@@ -138,7 +139,7 @@ function PDP() {
     {
       icon: Truck,
       title: "Delivery in 18 minutes.",
-      text: "Free on orders over ₹499. Fresh from the nearest store to your door.",
+      text: "Free on orders over $6. Fresh from the nearest store to your door.",
     },
     {
       icon: CreditCard,
@@ -214,7 +215,7 @@ function PDP() {
         {/* Details — 5 cols */}
         <div className="flex flex-col lg:col-span-5">
           <p className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
-            Apna Mandi · {product.unit}
+            {BRAND.name} · {product.unit}
           </p>
           <h1 className="mt-2 font-heading text-3xl font-bold leading-tight md:text-4xl">
             {product.name}
@@ -359,7 +360,7 @@ function PDP() {
             <div className="max-w-3xl space-y-4 text-sm leading-relaxed text-foreground/80">
               <p>{product.description}</p>
               <p>
-                Sourced to a single Apna Mandi standard and quality-checked before it reaches
+                Sourced to a single {BRAND.name} standard and quality-checked before it reaches
                 your basket. Stored cold where it matters and delivered fast, so it arrives as
                 fresh as it left the shelf.
               </p>

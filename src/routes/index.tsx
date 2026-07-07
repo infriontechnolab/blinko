@@ -8,6 +8,7 @@ import { PromoMosaic } from "@/components/promo-mosaic";
 import { HomeCategoryRail } from "@/components/home-category-rail";
 import { useCategoriesPanel } from "@/lib/categories-panel";
 import { products } from "@/lib/mock-data";
+import { BRAND } from "@/lib/brand";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -38,8 +39,8 @@ function Index() {
       <section className="mt-8 grid grid-cols-1 gap-3 rounded-2xl border border-border bg-surface p-4 sm:grid-cols-2 lg:grid-cols-4">
         {[
           { icon: Leaf, label: "Farm-direct freshness", note: "Sourced daily" },
-          { icon: Truck, label: "18-minute delivery", note: "Free over ₹499" },
-          { icon: ShieldCheck, label: "Quality assured", note: "The Apna Mandi promise" },
+          { icon: Truck, label: "18-minute delivery", note: "Free over $6" },
+          { icon: ShieldCheck, label: "Quality assured", note: `The ${BRAND.name} promise` },
           { icon: RotateCcw, label: "Easy returns", note: "No questions asked" },
         ].map(({ icon: Icon, label, note }) => (
           <div key={label} className="flex items-center gap-3 rounded-xl px-3 py-2">

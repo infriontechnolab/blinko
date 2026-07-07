@@ -3,7 +3,6 @@ import { defineConfig } from "vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
-import tsConfigPaths from "vite-tsconfig-paths";
 import { nitro } from "nitro/vite";
 
 const srcDir = fileURLToPath(new URL("./src", import.meta.url));
@@ -14,6 +13,7 @@ export default defineConfig(({ command }) => ({
   css: { transformer: "lightningcss" },
   resolve: {
     alias: { "@": srcDir },
+    tsconfigPaths: true,
     // Keep a single copy of React/Query across SSR + client to avoid hydration
     // mismatches and duplicate-context bugs.
     dedupe: [
@@ -35,7 +35,6 @@ export default defineConfig(({ command }) => ({
   server: { host: "::", port: 8080 },
   plugins: [
     tailwindcss(),
-    tsConfigPaths({ projects: ["./tsconfig.json"] }),
     tanstackStart({
       importProtection: {
         behavior: "error",

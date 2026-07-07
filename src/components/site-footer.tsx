@@ -1,6 +1,49 @@
 import { Link } from "@tanstack/react-router";
-import { Facebook, Twitter, Instagram, Linkedin, Phone, Mail, ShoppingBasket } from "lucide-react";
+import {
+  Facebook,
+  Twitter,
+  Instagram,
+  Linkedin,
+  Phone,
+  Mail,
+  ShoppingBasket,
+  Sunrise,
+  ShieldCheck,
+  DollarSign,
+  Truck,
+} from "lucide-react";
 import { useState } from "react";
+import { BRAND } from "@/lib/brand";
+
+const PROMISES: { icon: typeof Sunrise; title: string; body: string }[] = [
+  {
+    icon: Sunrise,
+    title: "The 6 AM Market Run",
+    body: "We're at the market at dawn, haggling over the good stuff, so you never have to.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Fresh-or-Free, Always",
+    body: "Not the best produce you've seen this week? We refund it. No forms, no arguments.",
+  },
+  {
+    icon: DollarSign,
+    title: "The Honest Market Price",
+    body: "Farmer-direct, no middleman markup — and every basket weighed to the last gram.",
+  },
+  {
+    icon: Truck,
+    title: "Before the Chai Cools",
+    body: "Cold-chain packed and on your doorstep across the city in minutes, not days.",
+  },
+];
+
+const STATS: { value: string; label: string }[] = [
+  { value: "2.4M", label: "baskets packed & counting" },
+  { value: "1,200+", label: "farmers on first-name terms" },
+  { value: "38", label: "cities, one single standard" },
+  { value: "9 min", label: "average run to your door" },
+];
 
 export function SiteFooter() {
   const [email, setEmail] = useState("");
@@ -8,13 +51,55 @@ export function SiteFooter() {
 
   return (
     <>
+      {/* Promise band — the four things we'd stake the shop on */}
+      <section className="border-t border-border bg-kraft/60">
+        <div className="mx-auto max-w-[1440px] px-4 py-12">
+          <p className="text-center font-mono text-[11px] font-bold uppercase tracking-[0.25em] text-primary">
+            The {BRAND.name} Promise
+          </p>
+          <h2 className="mx-auto mt-3 max-w-2xl text-center font-heading text-2xl font-bold md:text-3xl">
+            Four things we'd stake the whole shop on.
+          </h2>
+          <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            {PROMISES.map(({ icon: Icon, title, body }) => (
+              <div key={title} className="flex flex-col items-start">
+                <span className="grid size-12 place-items-center rounded-2xl bg-surface text-primary shadow-sm ring-1 ring-border">
+                  <Icon className="size-6" strokeWidth={1.75} />
+                </span>
+                <h3 className="mt-4 text-sm font-bold">{title}</h3>
+                <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">{body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Stats strip — proof, in tabular figures */}
+      <section className="border-t border-border bg-ink text-background">
+        <div className="mx-auto grid max-w-[1440px] grid-cols-2 gap-y-8 px-4 py-10 md:grid-cols-4">
+          {STATS.map(({ value, label }) => (
+            <div key={label} className="text-center">
+              <p className="font-mono text-3xl font-extrabold tracking-tight md:text-4xl">
+                {value}
+              </p>
+              <p className="mx-auto mt-1 max-w-[14ch] text-[11px] leading-snug text-background/60">
+                {label}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Newsletter */}
       <section className="border-t border-border bg-muted/40">
         <div className="mx-auto grid max-w-[1440px] gap-6 px-4 py-10 md:grid-cols-[1fr_auto] md:items-center">
           <div>
-            <h3 className="font-heading text-2xl font-bold">Join our newsletter for ₹100 off</h3>
+            <h3 className="font-heading text-2xl font-bold">
+              The freshest email you'll get all week
+            </h3>
             <p className="mt-1 text-sm text-muted-foreground">
-              Register for the latest updates on promotions & coupons. Don't worry, we don't spam.
+              One note every Sunday — what's in season, what's cheap, what's worth cooking. First
+              order gets $1.20 off. We never spam; we're too busy at the market.
             </p>
           </div>
           <form
@@ -36,15 +121,20 @@ export function SiteFooter() {
               type="submit"
               className="h-11 shrink-0 rounded-full bg-primary px-6 text-sm font-bold text-primary-foreground"
             >
-              {subscribed ? "Sent" : "Send"}
+              {subscribed ? "You're in" : "Send it"}
             </button>
           </form>
         </div>
         <p className="mx-auto max-w-[1440px] px-4 pb-4 text-[11px] text-muted-foreground">
           By subscribing you agree to our{" "}
-          <span className="text-primary underline-offset-2 hover:underline">Terms & Conditions</span>{" "}
+          <span className="text-primary underline-offset-2 hover:underline">
+            Terms & Conditions
+          </span>{" "}
           and{" "}
-          <span className="text-primary underline-offset-2 hover:underline">Privacy & Cookies Policy</span>.
+          <span className="text-primary underline-offset-2 hover:underline">
+            Privacy & Cookies Policy
+          </span>
+          .
         </p>
       </section>
 
@@ -56,15 +146,15 @@ export function SiteFooter() {
                 <ShoppingBasket className="size-5" />
               </span>
               <span className="text-xl font-extrabold leading-none tracking-tight">
-                <span className="text-foreground">Apna</span>
-                <span className="text-primary">Mandi</span>
+                <span className="text-foreground">{BRAND.wordmarkPrefix}</span>
+                <span className="text-primary">{BRAND.wordmarkSuffix}</span>
               </span>
             </div>
             <h4 className="mt-6 text-sm font-bold">One store. One standard.</h4>
             <p className="mt-2 max-w-xs text-xs leading-relaxed text-muted-foreground">
-              Every basket is sourced, checked and packed to the same Apna Mandi
-              promise — farm-fresh produce and trusted staples, delivered across
-              your city in minutes.
+              Started by folks who couldn't find a single tomato worth buying online. So we built
+              the shop we wanted — one basket, one promise, packed the same way whether it's for our
+              home or yours.
             </p>
             <div className="mt-4 flex items-start gap-3">
               <div className="grid size-9 place-items-center rounded-full bg-muted text-primary">
@@ -72,9 +162,9 @@ export function SiteFooter() {
               </div>
               <div>
                 <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-                  Mon–Fri: 08am–9pm
+                  Every day, 6am–11pm
                 </p>
-                <p className="font-heading text-lg font-bold">0 800 300-353</p>
+                <p className="font-heading text-lg font-bold">1800 200 {BRAND.name.toUpperCase()}</p>
               </div>
             </div>
             <div className="mt-3 flex items-start gap-3">
@@ -83,54 +173,61 @@ export function SiteFooter() {
               </div>
               <div>
                 <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-                  Need help with your order?
+                  A real human replies
                 </p>
-                <p className="text-sm font-semibold">help@apnamandi.co</p>
+                <p className="text-sm font-semibold">{BRAND.supportEmail}</p>
               </div>
             </div>
           </div>
 
           <FooterCol
-            title="Discover"
+            title="Fill the Basket"
             links={[
-              ["Fresh Produce", "/browse"],
-              ["Pantry Staples", "/browse"],
+              ["Fresh Off the Farm", "/browse"],
+              ["Pantry & Staples", "/browse"],
               ["Dairy & Eggs", "/browse"],
-              ["Snacks", "/browse"],
-              ["Beverages", "/browse"],
+              ["Snack Attack", "/browse"],
+              ["Chai & Beverages", "/browse"],
             ]}
           />
           <FooterCol
-            title="Let Us Help You"
+            title="We've Got You"
             links={[
-              ["Accessibility Statement", "/"],
-              ["Your Orders", "/orders"],
+              ["Track My Order", "/orders"],
+              ["Fresh-or-Free Refunds", "/"],
               ["Returns & Replacements", "/"],
-              ["Shipping Rates & Policies", "/"],
-              ["Refund & Returns", "/"],
+              ["Delivery Areas & Slots", "/"],
+              ["Accessibility", "/"],
               ["Privacy Policy", "/"],
             ]}
           />
           <FooterCol
-            title="Get to Know Us"
+            title="The Shop Behind It"
             links={[
-              ["Careers at Apna Mandi", "/"],
-              ["About Apna Mandi", "/"],
-              ["Investor Relations", "/"],
-              ["Apna Mandi Devices", "/"],
-              ["Customer Reviews", "/"],
-              ["Social Responsibility", "/"],
-              ["Store Locations", "/"],
+              [`Our ${BRAND.name} Story`, "/"],
+              ["Meet the Farmers", "/"],
+              ["Work With Us", "/"],
+              [`Sell on ${BRAND.name}`, "/"],
+              ["What Shoppers Say", "/"],
+              ["Sourcing & Ethics", "/"],
             ]}
           />
 
           <div>
-            <h4 className="font-bold">Download our App</h4>
+            <h4 className="font-bold">Shop from your pocket</h4>
             <div className="mt-3 flex flex-col gap-3">
-              <StoreBadge line1="GET IT ON" line2="Google Play" note="10% Discount" />
-              <StoreBadge line1="Download on the" line2="App Store" note="20% Bonus" />
+              <StoreBadge
+                src="/google-play-button.png"
+                alt="Get it on Google Play"
+                note="10% Off"
+              />
+              <StoreBadge
+                src="/apple-store-button.png"
+                alt="Download on the App Store"
+                note="$1.20 Off"
+              />
             </div>
-            <h4 className="mt-6 text-sm font-bold">Follow us on social media:</h4>
+            <h4 className="mt-6 text-sm font-bold">Come say hi:</h4>
             <div className="mt-3 flex items-center gap-2">
               {[Facebook, Twitter, Instagram, Linkedin].map((Icon, i) => (
                 <a
@@ -148,9 +245,7 @@ export function SiteFooter() {
 
         <div className="border-t border-border">
           <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-3 px-4 py-4 text-[11px] text-muted-foreground">
-            <p>
-              Copyright © 2026 <span className="font-semibold text-foreground">Apna Mandi</span> Grocery Co. All rights reserved.
-            </p>
+            <p>Packed with care in India 🇮🇳 · Weighed honestly, every single time.</p>
             <div className="flex items-center gap-3 font-mono">
               <span className="rounded bg-muted px-2 py-1 font-bold text-[#1a1f71]">VISA</span>
               <span className="rounded bg-muted px-2 py-1 font-bold text-[#eb001b]">●●</span>
@@ -159,11 +254,21 @@ export function SiteFooter() {
               <span className="rounded bg-muted px-2 py-1 font-bold text-foreground">COD</span>
             </div>
             <div className="flex gap-4">
-              <Link to="/" className="hover:text-primary">Terms & Conditions</Link>
-              <Link to="/" className="hover:text-primary">Privacy Policy</Link>
-              <Link to="/orders" className="hover:text-primary">Order Tracking</Link>
+              <Link to="/" className="hover:text-primary">
+                Terms & Conditions
+              </Link>
+              <Link to="/" className="hover:text-primary">
+                Privacy Policy
+              </Link>
+              <Link to="/orders" className="hover:text-primary">
+                Order Tracking
+              </Link>
             </div>
           </div>
+          <p className="mx-auto max-w-[1440px] px-4 pb-4 text-[11px] text-muted-foreground">
+            © 2026 <span className="font-semibold text-foreground">{BRAND.name}</span> Grocery Co. All
+            rights reserved. No tomato was oversold in the making of this store.
+          </p>
         </div>
       </footer>
     </>
@@ -187,20 +292,11 @@ function FooterCol({ title, links }: { title: string; links: [string, string][] 
   );
 }
 
-function StoreBadge({ line1, line2, note }: { line1: string; line2: string; note: string }) {
+function StoreBadge({ src, alt, note }: { src: string; alt: string; note: string }) {
   return (
-    <a
-      href="#"
-      className="flex items-center gap-3 rounded-lg border border-border bg-ink px-3 py-2 text-background hover:opacity-90"
-    >
-      <div className="grid size-7 place-items-center rounded bg-background/10 text-lg leading-none">
-        ⬇
-      </div>
-      <div className="flex-1 leading-tight">
-        <p className="text-[9px] font-mono uppercase tracking-widest opacity-70">{line1}</p>
-        <p className="font-heading text-sm font-bold">{line2}</p>
-      </div>
-      <span className="rounded-full bg-accent px-2 py-0.5 text-[9px] font-bold text-accent-foreground">
+    <a href="#" className="flex items-center gap-3 transition-opacity hover:opacity-90">
+      <img src={src} alt={alt} className="h-11 w-auto shrink-0" width={150} height={48} />
+      <span className="whitespace-nowrap rounded-full bg-accent px-2 py-0.5 text-[10px] font-bold text-accent-foreground">
         {note}
       </span>
     </a>

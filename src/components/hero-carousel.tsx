@@ -24,7 +24,7 @@ const SLIDES: Slide[] = [
     title: "Fresh fruits & veggies, picked this morning",
     subtitle: "Sourced daily from local farms. No cold storage, no middlemen.",
     productId: "am-avocado",
-    chips: ["100% Organic", "Free over ₹499"],
+    chips: ["100% Organic", "Free over $6"],
     cta: { label: "Shop fresh produce", to: "/browse", search: { category: "fruits-veg" } },
     bg: "linear-gradient(120deg, #eaf6e6 0%, #f6fbf2 55%, #fbfdf8 100%)",
     accent: "#4d8b3f",

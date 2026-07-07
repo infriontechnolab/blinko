@@ -1,10 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Package } from "lucide-react";
-import { pastOrders } from "@/lib/mock-data";
+import { pastOrders, type Order } from "@/lib/mock-data";
 import { formatPrice } from "@/lib/cart-store";
+import { useOrders, useNow, hydrateOrder } from "@/lib/orders-store";
+import { BRAND } from "@/lib/brand";
 
 export const Route = createFileRoute("/orders/")({
-  head: () => ({ meta: [{ title: "Your orders — Apna Mandi" }] }),
+  head: () => ({ meta: [{ title: `Your orders — ${BRAND.name}` }] }),
   component: Orders,
 });
 
@@ -16,6 +18,16 @@ const statusLabels: Record<string, { label: string; tone: string }> = {
 };
 
 function Orders() {
+  const { stored } = useOrders();
+  const now = useNow(15_000);
+
+  // Freshly placed orders (live status) first, then the static history. Once
+  // the clock has ticked, sort everything newest-first.
+  const orders: Order[] = [
+    ...stored.map((o) => hydrateOrder(o, now || Date.now())),
+    ...pastOrders,
+  ].sort((a, b) => new Date(b.placedAt).getTime() - new Date(a.placedAt).getTime());
+
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 md:py-10">
       <header className="mb-8">
@@ -26,7 +38,7 @@ function Orders() {
       </header>
 
       <ul className="space-y-4">
-        {pastOrders.map((o) => {
+        {orders.map((o) => {
           const s = statusLabels[o.status];
           const totalItems = o.items.reduce((a, b) => a + b.qty, 0);
           return (
@@ -48,7 +60,7 @@ function Orders() {
                       <span className="font-mono">{formatPrice(o.total)}</span>
                     </p>
                     <p className="font-mono text-[11px] text-muted-foreground">
-                      {new Date(o.placedAt).toLocaleString("en-IN", {
+                      {new Date(o.placedAt).toLocaleString("en-US", {
                         dateStyle: "medium",
                         timeStyle: "short",
                       })}
@@ -56,7 +68,9 @@ function Orders() {
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wider ${s.tone}`}>
+                  <span
+                    className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wider ${s.tone}`}
+                  >
                     {s.label}
                     {o.status === "out_for_delivery" && o.etaMinutes ? ` · ${o.etaMinutes}m` : ""}
                   </span>
@@ -65,7 +79,8 @@ function Orders() {
                     params={{ id: o.id }}
                     className="inline-flex items-center gap-1 rounded-lg border border-border px-3 py-2 text-xs font-semibold hover:bg-muted"
                   >
-                    {o.status === "delivered" ? "Reorder" : "Track"} <ArrowRight className="size-3.5" />
+                    {o.status === "delivered" ? "Reorder" : "Track"}{" "}
+                    <ArrowRight className="size-3.5" />
                   </Link>
                 </div>
               </div>
