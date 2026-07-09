@@ -214,14 +214,17 @@ export function SiteHeader() {
                   <ul className="max-h-96 overflow-y-auto py-1">
                     {suggestions.map((p) => (
                       <li key={p.id}>
-                        <Link
-                          to="/products/$id"
-                          params={{ id: p.id }}
-                          onClick={() => {
+                        <button
+                          type="button"
+                          // Navigate on mousedown so it wins the race against the
+                          // input's onBlur timer that closes this dropdown.
+                          onMouseDown={(e) => {
+                            e.preventDefault();
                             setSearchFocus(false);
                             setQ("");
+                            navigate({ to: "/products/$id", params: { id: p.id } });
                           }}
-                          className="flex items-center gap-3 px-3 py-2 hover:bg-muted"
+                          className="flex w-full items-center gap-3 px-3 py-2 text-left hover:bg-muted"
                         >
                           <img
                             src={p.image}
@@ -232,7 +235,7 @@ export function SiteHeader() {
                           <span className="shrink-0 text-sm font-semibold">
                             {formatPrice(p.price)}
                           </span>
-                        </Link>
+                        </button>
                       </li>
                     ))}
                   </ul>

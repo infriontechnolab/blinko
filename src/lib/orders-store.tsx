@@ -26,10 +26,10 @@ const KEY = "blinko-orders-v1";
 const FRESH_MS = 45 * 60_000; // keep a placed order visible for 45 minutes
 
 // Compressed delivery timeline (ms after placedAt) so the status visibly moves
-// during a demo instead of taking real-world hours.
-const PACKED_AT = 45_000; // 0:45
-const OUT_AT = 150_000; // 2:30
-const DELIVERED_AT = 480_000; // 8:00
+// during a demo instead of taking real-world hours. Steps advance every 10s.
+const PACKED_AT = 10_000; // 0:10
+const OUT_AT = 20_000; // 0:20
+const DELIVERED_AT = 30_000; // 0:30
 
 /** Derive live status + ETA from elapsed time since the order was placed. */
 export function deriveStatus(
