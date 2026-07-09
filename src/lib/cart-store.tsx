@@ -32,7 +32,7 @@ type CartContextValue = {
 
 const CartContext = createContext<CartContextValue | null>(null);
 
-const KEY = "cartelo-cart-v1";
+const KEY = "blinko-cart-v1";
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = usePersistentState<CartItem[]>(KEY, [], isCartItems);

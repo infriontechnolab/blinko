@@ -1,5 +1,17 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { Search, ShoppingBag, ShoppingBasket, MapPin, Heart, User, ChevronDown, Package, Menu, LayoutGrid, TrendingUp, Star } from "lucide-react";
+import {
+  Search,
+  ShoppingBag,
+  MapPin,
+  Heart,
+  User,
+  ChevronDown,
+  Package,
+  Menu,
+  LayoutGrid,
+  TrendingUp,
+  Star,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { useCart, formatPrice } from "@/lib/cart-store";
 import { useWishlist } from "@/lib/wishlist-store";
@@ -46,7 +58,11 @@ export function SiteHeader() {
   const [mobileNav, setMobileNav] = useState(false);
   const [searchFocus, setSearchFocus] = useState(false);
   const [mobileCat, setMobileCat] = useState<string | null>(null);
-  const [location, setLocation] = usePersistentState<string>("cartelo-location", "Noida 62", isString);
+  const [location, setLocation] = usePersistentState<string>(
+    "blinko-location",
+    "Noida 62",
+    isString,
+  );
   const [locOpen, setLocOpen] = useState(false);
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -87,7 +103,8 @@ export function SiteHeader() {
           <p className="flex items-center gap-2">
             <span className="hidden sm:inline">🛒</span>
             <span>
-              <span className="font-semibold">Free delivery</span> & 40% discount on your first 3 orders. Place your 1st order in.
+              <span className="font-semibold">Free delivery</span> & 40% discount on your first 3
+              orders. Place your 1st order in.
             </span>
           </p>
           <p className="flex items-center gap-2 font-mono">
@@ -104,11 +121,18 @@ export function SiteHeader() {
       <div className="hidden w-full border-b border-border bg-muted/50 md:block">
         <div className="mx-auto flex h-9 max-w-[1440px] items-center justify-between px-4 text-xs text-muted-foreground">
           <div className="flex items-center gap-5">
-            <Link to="/" className="hover:text-primary">About Us</Link>
-            <Link to="/orders" className="hover:text-primary">My Account</Link>
-            <Link to="/wishlist" className="hover:text-primary">Wishlist</Link>
+            <Link to="/" className="hover:text-primary">
+              About Us
+            </Link>
+            <Link to="/orders" className="hover:text-primary">
+              My Account
+            </Link>
+            <Link to="/wishlist" className="hover:text-primary">
+              Wishlist
+            </Link>
             <span className="hidden lg:inline">
-              We deliver every day from <span className="font-mono font-semibold text-foreground">7:00–23:00</span>
+              We deliver every day from{" "}
+              <span className="font-mono font-semibold text-foreground">7:00–23:00</span>
             </span>
           </div>
           <div className="flex items-center gap-5">
@@ -137,9 +161,11 @@ export function SiteHeader() {
           </button>
 
           <Link to="/" className="flex shrink-0 items-center gap-2.5">
-            <span className="grid size-10 place-items-center rounded-xl bg-primary text-primary-foreground shadow-sm">
-              <ShoppingBasket className="size-5" />
-            </span>
+            <img
+              src={BRAND.icon}
+              alt={`${BRAND.name} logo`}
+              className="size-10 shrink-0 rounded-xl object-contain"
+            />
             <span className="text-2xl font-extrabold leading-none tracking-tight">
               <span className="text-foreground">{BRAND.wordmarkPrefix}</span>
               <span className="text-primary">{BRAND.wordmarkSuffix}</span>
@@ -254,9 +280,7 @@ export function SiteHeader() {
                   {count}
                 </span>
               </div>
-              <span className="hidden font-mono text-xs sm:inline">
-                {formatPrice(subtotal)}
-              </span>
+              <span className="hidden font-mono text-xs sm:inline">{formatPrice(subtotal)}</span>
             </button>
           </div>
         </div>
@@ -264,7 +288,11 @@ export function SiteHeader() {
         {/* Mobile search */}
         <div className="border-t border-border px-4 pb-3 pt-2 md:hidden">
           <form onSubmit={submitSearch} role="search" className="relative">
-            <button type="submit" aria-label="Search" className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+            <button
+              type="submit"
+              aria-label="Search"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+            >
               <Search className="size-4" />
             </button>
             <input

@@ -6,7 +6,6 @@ import {
   Linkedin,
   Phone,
   Mail,
-  ShoppingBasket,
   Sunrise,
   ShieldCheck,
   DollarSign,
@@ -142,9 +141,11 @@ export function SiteFooter() {
         <div className="mx-auto grid max-w-[1440px] grid-cols-2 gap-10 px-4 py-14 md:grid-cols-6">
           <div className="col-span-2">
             <div className="flex items-center gap-2.5">
-              <span className="grid size-10 place-items-center rounded-xl bg-primary text-primary-foreground">
-                <ShoppingBasket className="size-5" />
-              </span>
+              <img
+                src={BRAND.icon}
+                alt={`${BRAND.name} logo`}
+                className="size-10 shrink-0 rounded-xl object-contain"
+              />
               <span className="text-xl font-extrabold leading-none tracking-tight">
                 <span className="text-foreground">{BRAND.wordmarkPrefix}</span>
                 <span className="text-primary">{BRAND.wordmarkSuffix}</span>
@@ -164,7 +165,9 @@ export function SiteFooter() {
                 <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
                   Every day, 6am–11pm
                 </p>
-                <p className="font-heading text-lg font-bold">1800 200 {BRAND.name.toUpperCase()}</p>
+                <p className="font-heading text-lg font-bold">
+                  1800 200 {BRAND.name.toUpperCase()}
+                </p>
               </div>
             </div>
             <div className="mt-3 flex items-start gap-3">
@@ -266,8 +269,8 @@ export function SiteFooter() {
             </div>
           </div>
           <p className="mx-auto max-w-[1440px] px-4 pb-4 text-[11px] text-muted-foreground">
-            © 2026 <span className="font-semibold text-foreground">{BRAND.name}</span> Grocery Co. All
-            rights reserved. No tomato was oversold in the making of this store.
+            © 2026 <span className="font-semibold text-foreground">{BRAND.name}</span> Grocery Co.
+            All rights reserved. No tomato was oversold in the making of this store.
           </p>
         </div>
       </footer>

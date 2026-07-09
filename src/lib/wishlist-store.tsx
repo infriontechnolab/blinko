@@ -9,7 +9,7 @@ type Ctx = {
 };
 
 const WishlistContext = createContext<Ctx | null>(null);
-const KEY = "cartelo-wishlist-v1";
+const KEY = "blinko-wishlist-v1";
 
 function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every((x) => typeof x === "string");

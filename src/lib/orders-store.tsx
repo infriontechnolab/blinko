@@ -22,7 +22,7 @@ import type { Order, OrderStatus } from "./mock-data";
 // from placedAt and are never persisted.
 export type StoredOrder = Omit<Order, "status" | "etaMinutes">;
 
-const KEY = "cartelo-orders-v1";
+const KEY = "blinko-orders-v1";
 const FRESH_MS = 45 * 60_000; // keep a placed order visible for 45 minutes
 
 // Compressed delivery timeline (ms after placedAt) so the status visibly moves
