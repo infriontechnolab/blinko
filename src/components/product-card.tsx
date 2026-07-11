@@ -52,7 +52,7 @@ function OfferCountdown({ hours }: { hours: number }) {
   );
 }
 
-function Stars({ rating }: { rating: number }) {
+export function Stars({ rating }: { rating: number }) {
   return (
     <span className="inline-flex items-center gap-0.5">
       {[1, 2, 3, 4, 5].map((i) => (

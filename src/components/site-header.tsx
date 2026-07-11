@@ -19,7 +19,8 @@ import { CartDrawer } from "@/components/cart-drawer";
 import { LocationPicker } from "@/components/location-picker";
 import { usePersistentState } from "@/hooks/use-persistent-state";
 import { useCategoriesPanel } from "@/lib/categories-panel";
-import { categories, products } from "@/lib/mock-data";
+import { categories, products, stores } from "@/lib/mock-data";
+import { storeLogoUrl } from "@/components/store-card";
 import { BRAND } from "@/lib/brand";
 
 const isString = (v: unknown): v is string => typeof v === "string";
@@ -60,7 +61,7 @@ export function SiteHeader() {
   const [mobileCat, setMobileCat] = useState<string | null>(null);
   const [location, setLocation] = usePersistentState<string>(
     "blinko-location",
-    "Noida 62",
+    "21 Queen Mary Drive, Brampton ON L7A 1X7",
     isString,
   );
   const [locOpen, setLocOpen] = useState(false);
@@ -73,7 +74,11 @@ export function SiteHeader() {
 
   const runSearch = () => {
     const query = q.trim();
-    navigate({ to: "/browse", search: query ? { q: query } : {} });
+    if (isHome) {
+      navigate({ to: "/", search: query ? { q: query } : {} });
+    } else {
+      navigate({ to: "/browse", search: query ? { q: query } : {} });
+    }
     setMobileNav(false);
     setSearchFocus(false);
   };
@@ -84,7 +89,11 @@ export function SiteHeader() {
   };
 
   const needle = q.trim().toLowerCase();
-  const suggestions =
+  const storeSuggestions =
+    needle.length >= 2
+      ? stores.filter((v) => v.name.toLowerCase().includes(needle)).slice(0, 6)
+      : [];
+  const productSuggestions =
     needle.length >= 2
       ? products.filter((p) => p.name.toLowerCase().includes(needle)).slice(0, 6)
       : [];
@@ -194,9 +203,15 @@ export function SiteHeader() {
                 onChange={(e) => setQ(e.target.value)}
                 onFocus={() => setSearchFocus(true)}
                 onBlur={() => setTimeout(() => setSearchFocus(false), 150)}
-                placeholder="Search for products, categories or brands…"
+                placeholder={
+                  isHome
+                    ? "Search stores, categories…"
+                    : "Search for products, categories or brands…"
+                }
                 aria-label="Search the store"
-                aria-expanded={searchFocus && suggestions.length > 0}
+                aria-expanded={
+                  searchFocus && (isHome ? storeSuggestions.length : productSuggestions.length) > 0
+                }
                 className="h-11 w-full rounded-full border border-border bg-surface pl-5 pr-32 text-sm outline-none transition-shadow focus:border-primary focus:ring-2 focus:ring-primary/15"
               />
               <button
@@ -209,10 +224,51 @@ export function SiteHeader() {
               </button>
 
               {/* Live suggestions */}
-              {searchFocus && suggestions.length > 0 ? (
+              {searchFocus && isHome && storeSuggestions.length > 0 ? (
                 <div className="absolute left-0 right-0 top-full z-50 mt-2 overflow-hidden rounded-2xl border border-border bg-surface shadow-xl">
                   <ul className="max-h-96 overflow-y-auto py-1">
-                    {suggestions.map((p) => (
+                    {storeSuggestions.map((v) => (
+                      <li key={v.id}>
+                        <button
+                          type="button"
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            setSearchFocus(false);
+                            setQ("");
+                            navigate({ to: "/store/$slug", params: { slug: v.slug } });
+                          }}
+                          className="flex w-full items-center gap-3 px-3 py-2 text-left hover:bg-muted"
+                        >
+                          <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-white p-1.5">
+                            <img
+                              src={storeLogoUrl(v)}
+                              alt=""
+                              loading="lazy"
+                              className="size-full object-contain"
+                            />
+                          </span>
+                          <span className="min-w-0 flex-1 truncate text-sm">{v.name}</span>
+                          <span className="shrink-0 text-xs text-muted-foreground">
+                            {v.tagline}
+                          </span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                  <button
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={runSearch}
+                    className="flex w-full items-center gap-2 border-t border-border px-3 py-2.5 text-sm font-semibold text-primary hover:bg-muted"
+                  >
+                    <Search className="size-4" /> See all results for “{q.trim()}”
+                  </button>
+                </div>
+              ) : null}
+              {searchFocus && !isHome && productSuggestions.length > 0 ? (
+                <div className="absolute left-0 right-0 top-full z-50 mt-2 overflow-hidden rounded-2xl border border-border bg-surface shadow-xl">
+                  <ul className="max-h-96 overflow-y-auto py-1">
+                    {productSuggestions.map((p) => (
                       <li key={p.id}>
                         <button
                           type="button"

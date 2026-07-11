@@ -11,6 +11,7 @@ export const BRAND = {
   logo: "/blinko-logo.png",
   icon: "/blinko-icon.png",
   supportEmail: "help@blinko.co",
+  tagline: "Every Doorstep Deserves a Smile",
 } as const;
 
 export const CURRENCY = {

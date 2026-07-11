@@ -151,7 +151,7 @@ export function SiteFooter() {
                 <span className="text-primary">{BRAND.wordmarkSuffix}</span>
               </span>
             </div>
-            <h4 className="mt-6 text-sm font-bold">One store. One standard.</h4>
+            <h4 className="mt-6 text-sm font-bold">{BRAND.tagline}</h4>
             <p className="mt-2 max-w-xs text-xs leading-relaxed text-muted-foreground">
               Started by folks who couldn't find a single tomato worth buying online. So we built
               the shop we wanted — one basket, one promise, packed the same way whether it's for our
