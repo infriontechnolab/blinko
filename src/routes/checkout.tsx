@@ -296,7 +296,7 @@ function Checkout() {
             {placing ? "Placing order…" : `Place order · ${formatPrice(total)}`}
           </button>
           <p className="mt-3 text-center font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-            One store · One promise · {BRAND.name}
+            {BRAND.tagline} · {BRAND.name}
           </p>
         </aside>
       </div>

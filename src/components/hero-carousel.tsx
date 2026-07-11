@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, ChevronLeft, ChevronRight, Star, Zap } from "lucide-react";
-import { getProduct, discountPct } from "@/lib/mock-data";
+import { getProduct, getStoreBySlug, discountPct, stores } from "@/lib/mock-data";
 import { formatPrice } from "@/lib/cart-store";
+import { storeLogoUrl } from "@/components/store-card";
 
 const AUTOPLAY_MS = 5500;
 
-type Slide = {
+type ProductSlide = {
+  kind: "product";
   eyebrow: string;
   title: string;
   subtitle: string;
@@ -18,8 +20,36 @@ type Slide = {
   accent: string;
 };
 
+// Spotlights the store-first catalog itself rather than a single product —
+// its image slot is a small logo collage instead of a product photo.
+type StoresSlide = {
+  kind: "stores";
+  eyebrow: string;
+  title: string;
+  subtitle: string;
+  storeSlugs: string[];
+  chips: string[];
+  cta: { label: string; href: string };
+  bg: string;
+  accent: string;
+};
+
+type Slide = ProductSlide | StoresSlide;
+
 const SLIDES: Slide[] = [
   {
+    kind: "stores",
+    eyebrow: "New: shop by store",
+    title: "Every store you love, now in one app",
+    subtitle: "Groceries, pharmacy, bakery, electronics and more — one seamless checkout.",
+    storeSlugs: ["freshmart-grocery", "green-basket", "daily-dairy", "bake-bliss"],
+    chips: ["One checkout", "One delivery"],
+    cta: { label: "Explore all stores", href: "#all-stores" },
+    bg: "linear-gradient(120deg, #eef2f8 0%, #f5f7fb 55%, #fcfdff 100%)",
+    accent: "#3b6fa0",
+  },
+  {
+    kind: "product",
     eyebrow: "Farm to doorstep in 18 minutes",
     title: "Fresh fruits & veggies, picked this morning",
     subtitle: "Sourced daily from local farms. No cold storage, no middlemen.",
@@ -30,6 +60,7 @@ const SLIDES: Slide[] = [
     accent: "#4d8b3f",
   },
   {
+    kind: "product",
     eyebrow: "Only this week",
     title: "Up to 40% off your first 3 orders",
     subtitle: "Stock the pantry for less — staples, dairy, snacks & more.",
@@ -40,6 +71,7 @@ const SLIDES: Slide[] = [
     accent: "#c2410c",
   },
   {
+    kind: "product",
     eyebrow: "Morning essentials",
     title: "Farm-fresh dairy at your door by dawn",
     subtitle: "Milk, eggs & yogurt delivered cold before you wake up.",
@@ -50,6 +82,7 @@ const SLIDES: Slide[] = [
     accent: "#3b6fa0",
   },
   {
+    kind: "product",
     eyebrow: "Baked & bottled fresh",
     title: "Artisan sourdough & wildflower honey",
     subtitle: "Slow-baked loaves and raw honey from small-batch makers.",
@@ -97,8 +130,9 @@ export function HeroCarousel() {
   }, [paused, active]);
 
   const slide = SLIDES[active];
-  const product = getProduct(slide.productId)!;
-  const off = discountPct(product);
+  const product = slide.kind === "product" ? getProduct(slide.productId)! : null;
+  const off = product ? discountPct(product) : 0;
+  const avgStoreRating = stores.reduce((sum, s) => sum + s.rating, 0) / stores.length;
 
   return (
     <section
@@ -149,27 +183,46 @@ export function HeroCarousel() {
             {slide.subtitle}
           </p>
 
-          {/* Rating + price */}
+          {/* Rating + price, or store stats for the stores slide */}
           <div
             className="hero-rise mt-4 flex flex-wrap items-center gap-x-4 gap-y-2"
             style={{ animationDelay: "0.28s" }}
           >
-            <span className="inline-flex items-center gap-1.5">
-              <Stars rating={product.rating} accent={slide.accent} />
-              <span className="font-mono text-xs text-muted-foreground">
-                {product.rating.toFixed(1)} ({product.reviewCount})
-              </span>
-            </span>
-            <span className="flex items-baseline gap-2">
-              <span className="font-mono text-2xl font-bold text-sale">
-                {formatPrice(product.price)}
-              </span>
-              {product.compareAtPrice ? (
-                <span className="font-mono text-sm text-muted-foreground line-through">
-                  {formatPrice(product.compareAtPrice)}
+            {slide.kind === "product" ? (
+              <>
+                <span className="inline-flex items-center gap-1.5">
+                  <Stars rating={product!.rating} accent={slide.accent} />
+                  <span className="font-mono text-xs text-muted-foreground">
+                    {product!.rating.toFixed(1)} ({product!.reviewCount})
+                  </span>
                 </span>
-              ) : null}
-            </span>
+                <span className="flex items-baseline gap-2">
+                  <span className="font-mono text-2xl font-bold text-sale">
+                    {formatPrice(product!.price)}
+                  </span>
+                  {product!.compareAtPrice ? (
+                    <span className="font-mono text-sm text-muted-foreground line-through">
+                      {formatPrice(product!.compareAtPrice)}
+                    </span>
+                  ) : null}
+                </span>
+              </>
+            ) : (
+              <>
+                <span className="flex items-baseline gap-1.5">
+                  <span className="font-mono text-2xl font-bold text-foreground">
+                    {stores.length}
+                  </span>
+                  <span className="text-xs text-muted-foreground">stores</span>
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <Stars rating={avgStoreRating} accent={slide.accent} />
+                  <span className="font-mono text-xs text-muted-foreground">
+                    {avgStoreRating.toFixed(1)} avg rating
+                  </span>
+                </span>
+              </>
+            )}
           </div>
 
           {/* CTA + trust chips */}
@@ -177,14 +230,24 @@ export function HeroCarousel() {
             className="hero-rise mt-6 flex flex-wrap items-center gap-3"
             style={{ animationDelay: "0.36s" }}
           >
-            <Link
-              to={slide.cta.to}
-              search={slide.cta.search}
-              className="group inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg"
-            >
-              {slide.cta.label}
-              <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
-            </Link>
+            {slide.kind === "product" ? (
+              <Link
+                to={slide.cta.to}
+                search={slide.cta.search}
+                className="group inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg"
+              >
+                {slide.cta.label}
+                <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+            ) : (
+              <a
+                href={slide.cta.href}
+                className="group inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg"
+              >
+                {slide.cta.label}
+                <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+              </a>
+            )}
             <div className="flex flex-wrap gap-2">
               {slide.chips.map((c) => (
                 <span
@@ -198,33 +261,51 @@ export function HeroCarousel() {
           </div>
         </div>
 
-        {/* Product image — glowing floated shot with a discount coin. */}
+        {/* Product image — glowing floated shot with a discount coin —
+            or a small store-logo collage for the stores slide. */}
         <div key={`img-${active}`} className="hero-pop relative mx-auto w-full max-w-sm">
           <div
             className="hero-glow absolute inset-6 rounded-full blur-2xl"
             style={{ background: slide.accent, opacity: 0.35 }}
             aria-hidden
           />
-          <div className="hero-float relative">
-            <img
-              src={product.image}
-              alt={product.name}
-              className="relative z-10 mx-auto aspect-square w-full max-w-[340px] object-contain drop-shadow-2xl"
-            />
-            {off > 0 ? (
-              <span
-                className="absolute right-2 top-2 z-20 flex size-16 flex-col items-center justify-center rounded-full text-center font-bold leading-none text-white shadow-lg md:right-6"
-                style={{ background: slide.accent }}
-              >
-                <span className="text-lg">{off}%</span>
-                <span className="mt-0.5 text-[9px] font-semibold uppercase tracking-wide">
-                  off
+          {slide.kind === "stores" ? (
+            <div className="hero-float relative grid grid-cols-2 place-items-center gap-4">
+              {slide.storeSlugs.map((slug) => {
+                const s = getStoreBySlug(slug);
+                if (!s) return null;
+                return (
+                  <div
+                    key={slug}
+                    className="grid size-28 place-items-center rounded-3xl border-4 border-surface bg-white p-4 shadow-xl"
+                  >
+                    <img src={storeLogoUrl(s)} alt={s.name} className="size-full object-contain" />
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="hero-float relative">
+              <img
+                src={product!.image}
+                alt={product!.name}
+                className="relative z-10 mx-auto aspect-square w-full max-w-[340px] object-contain drop-shadow-2xl"
+              />
+              {off > 0 ? (
+                <span
+                  className="absolute right-2 top-2 z-20 flex size-16 flex-col items-center justify-center rounded-full text-center font-bold leading-none text-white shadow-lg md:right-6"
+                  style={{ background: slide.accent }}
+                >
+                  <span className="text-lg">{off}%</span>
+                  <span className="mt-0.5 text-[9px] font-semibold uppercase tracking-wide">
+                    off
+                  </span>
                 </span>
-              </span>
-            ) : null}
-          </div>
+              ) : null}
+            </div>
+          )}
           <p className="relative z-10 mt-2 text-center text-sm font-semibold text-foreground">
-            {product.name}
+            {slide.kind === "stores" ? `${stores.length} stores and counting` : product!.name}
           </p>
         </div>
       </div>

@@ -5,7 +5,7 @@ type Coords = { lat: number; lon: number };
 
 // A few preset delivery areas with rough coordinates for the map preview.
 const PRESETS: { label: string; coords: Coords }[] = [
-  { label: "Noida 62", coords: { lat: 28.628, lon: 77.365 } },
+  { label: "21 Queen Mary Drive, Brampton ON L7A 1X7", coords: { lat: 43.7305, lon: -79.7791 } },
   { label: "Connaught Place, Delhi", coords: { lat: 28.6315, lon: 77.2167 } },
   { label: "Cyber Hub, Gurugram", coords: { lat: 28.4949, lon: 77.089 } },
   { label: "Bandra, Mumbai", coords: { lat: 19.0596, lon: 72.8295 } },
@@ -98,11 +98,7 @@ export function LocationPicker({
 
   return (
     <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center">
-      <div
-        onClick={onClose}
-        className="absolute inset-0 bg-ink/40 backdrop-blur-sm"
-        aria-hidden
-      />
+      <div onClick={onClose} className="absolute inset-0 bg-ink/40 backdrop-blur-sm" aria-hidden />
       <div className="relative z-10 flex max-h-[92vh] w-full max-w-lg flex-col overflow-hidden rounded-t-2xl bg-background shadow-2xl sm:rounded-2xl">
         <header className="flex items-center justify-between border-b border-border px-5 py-4">
           <div>
@@ -134,9 +130,7 @@ export function LocationPicker({
             {detecting ? "Detecting your location…" : "Use my current location"}
           </button>
 
-          {error ? (
-            <p className="mt-2 text-xs text-destructive">{error}</p>
-          ) : null}
+          {error ? <p className="mt-2 text-xs text-destructive">{error}</p> : null}
 
           {/* Map preview */}
           <div className="mt-4 overflow-hidden rounded-xl border border-border">

@@ -1,23 +1,52 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Leaf, Truck, ShieldCheck, RotateCcw } from "lucide-react";
-import { ProductCard } from "@/components/product-card";
+import { useMemo } from "react";
+import { z } from "zod";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { HeroCarousel } from "@/components/hero-carousel";
 import { PromoBannerRow } from "@/components/promo-banner-row";
-import { BestSellersTabs } from "@/components/best-sellers-tabs";
 import { PromoMosaic } from "@/components/promo-mosaic";
 import { HomeCategoryRail } from "@/components/home-category-rail";
+import { AllStoresBanner } from "@/components/all-stores-banner";
+import { StoreGrid } from "@/components/store-grid";
 import { useCategoriesPanel } from "@/lib/categories-panel";
-import { products } from "@/lib/mock-data";
+import { stores, storeCategories } from "@/lib/mock-data";
 import { BRAND } from "@/lib/brand";
 
+const search = z.object({
+  category: z.string().optional(),
+  q: z.string().optional(),
+  page: z.coerce.number().optional(),
+});
+
 export const Route = createFileRoute("/")({
+  validateSearch: search,
   component: Index,
 });
 
+const PAGE_SIZE = 8;
+
 function Index() {
-  const newArrivals = products.slice(0, 4);
-  const featured = products.slice(4, 8);
   const { open: catsOpen } = useCategoriesPanel();
+  const { category, q, page } = Route.useSearch();
+  const currentPage = page ?? 1;
+
+  const featuredStores = useMemo(() => stores.filter((v) => v.isFeatured), []);
+
+  const filteredStores = useMemo(() => {
+    let out = stores.slice();
+    if (category) out = out.filter((v) => v.categoryId === category);
+    if (q) {
+      const needle = q.toLowerCase();
+      out = out.filter(
+        (v) => v.name.toLowerCase().includes(needle) || v.tagline.toLowerCase().includes(needle),
+      );
+    }
+    return out;
+  }, [category, q]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredStores.length / PAGE_SIZE));
+  const pageItems = filteredStores.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+  const activeCategory = storeCategories.find((c) => c.id === category);
 
   return (
     <div className="mx-auto max-w-[1440px] px-4 py-6 md:py-10">
@@ -35,74 +64,140 @@ function Index() {
         <HeroCarousel />
       </div>
 
-      {/* Feature strip — 4 up */}
-      <section className="mt-8 grid grid-cols-1 gap-3 rounded-2xl border border-border bg-surface p-4 sm:grid-cols-2 lg:grid-cols-4">
-        {[
-          { icon: Leaf, label: "Farm-direct freshness", note: "Sourced daily" },
-          { icon: Truck, label: "18-minute delivery", note: "Free over $6" },
-          { icon: ShieldCheck, label: "Quality assured", note: `The ${BRAND.name} promise` },
-          { icon: RotateCcw, label: "Easy returns", note: "No questions asked" },
-        ].map(({ icon: Icon, label, note }) => (
-          <div key={label} className="flex items-center gap-3 rounded-xl px-3 py-2">
-            <div className="grid size-10 place-items-center rounded-full bg-primary/10 text-primary">
-              <Icon className="size-5" />
-            </div>
-            <div>
-              <p className="text-sm font-semibold">{label}</p>
-              <p className="text-xs text-muted-foreground">{note}</p>
-            </div>
-          </div>
-        ))}
-      </section>
+      {/* All-stores banner strip */}
+      <AllStoresBanner />
 
       {/* Three wide promo banners */}
       <PromoBannerRow />
 
-      {/* New Arrivals */}
-      <section className="mt-14">
-        <div className="mb-6 flex items-end justify-between">
-          <div>
-            <h2 className="text-2xl font-bold md:text-3xl">New arrivals</h2>
+      {/* Featured Stores */}
+      {featuredStores.length > 0 ? (
+        <section className="mt-14">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold md:text-3xl">Featured stores</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Special discounts, just for this week.
+              Top-rated stores, handpicked for you this week.
             </p>
           </div>
-          <Link to="/browse" className="text-sm font-semibold text-primary hover:underline">
-            View all →
-          </Link>
-        </div>
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-          {newArrivals.map((p) => (
-            <ProductCard key={p.id} product={p} />
-          ))}
-        </div>
-      </section>
+          <StoreGrid stores={featuredStores} />
+        </section>
+      ) : null}
 
       {/* Four tall promo banners */}
       <PromoMosaic />
 
-      {/* Featured Products */}
-      <section className="mt-14">
+      {/* All Stores — filterable, paginated */}
+      <section id="all-stores" className="mt-14 scroll-mt-24">
         <div className="mb-6 flex items-end justify-between">
           <div>
-            <h2 className="text-2xl font-bold md:text-3xl">Featured products</h2>
+            <h2 className="text-2xl font-bold md:text-3xl">All stores</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Don't miss this week's offers.
+              Browse every store on {BRAND.name}, from groceries to gadgets.
             </p>
           </div>
-          <Link to="/browse" className="text-sm font-semibold text-primary hover:underline">
-            View all →
-          </Link>
         </div>
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-          {featured.map((p) => (
-            <ProductCard key={p.id} product={p} />
+
+        {/* Category pill filter */}
+        <div className="mb-6 flex flex-wrap gap-2">
+          <Link
+            to="/"
+            search={{ q }}
+            className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
+              !category
+                ? "border-primary bg-primary text-primary-foreground"
+                : "border-border bg-surface hover:border-primary hover:text-primary"
+            }`}
+          >
+            All
+          </Link>
+          {storeCategories.map((c) => (
+            <Link
+              key={c.id}
+              to="/"
+              search={{ category: c.id, q }}
+              className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
+                category === c.id
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border bg-surface hover:border-primary hover:text-primary"
+              }`}
+            >
+              {c.name}
+            </Link>
           ))}
         </div>
-      </section>
 
-      {/* Best sellers — tabbed by aisle */}
-      <BestSellersTabs />
+        {pageItems.length === 0 ? (
+          <div className="rounded-xl border border-dashed border-border bg-muted/30 p-12 text-center text-sm text-muted-foreground">
+            No stores match{activeCategory ? ` ${activeCategory.name}` : ""}
+            {q ? ` “${q}”` : ""}.
+          </div>
+        ) : (
+          <StoreGrid stores={pageItems} />
+        )}
+
+        {/* Pagination */}
+        {totalPages > 1 ? (
+          <div className="mt-8 flex items-center justify-center gap-2">
+            <PageBtn
+              search={{ category, q, page: Math.max(1, currentPage - 1) }}
+              disabled={currentPage === 1}
+              icon
+            >
+              <ChevronLeft className="size-4" />
+            </PageBtn>
+            {Array.from({ length: totalPages }).map((_, i) => {
+              const p = i + 1;
+              return (
+                <PageBtn key={p} search={{ category, q, page: p }} active={p === currentPage}>
+                  {p}
+                </PageBtn>
+              );
+            })}
+            <PageBtn
+              search={{ category, q, page: Math.min(totalPages, currentPage + 1) }}
+              disabled={currentPage === totalPages}
+              icon
+            >
+              <ChevronRight className="size-4" />
+            </PageBtn>
+          </div>
+        ) : null}
+      </section>
     </div>
+  );
+}
+
+function PageBtn({
+  children,
+  search,
+  active,
+  disabled,
+  icon,
+}: {
+  children: React.ReactNode;
+  search: { category?: string; q?: string; page?: number };
+  active?: boolean;
+  disabled?: boolean;
+  icon?: boolean;
+}) {
+  if (disabled) {
+    return (
+      <span className="grid size-9 place-items-center rounded-md border border-border text-xs text-muted-foreground/50">
+        {children}
+      </span>
+    );
+  }
+  return (
+    <Link
+      to="/"
+      search={search}
+      className={`grid size-9 place-items-center rounded-md border text-xs font-semibold ${
+        active
+          ? "border-primary bg-primary text-primary-foreground"
+          : "border-border bg-surface hover:border-primary hover:text-primary"
+      } ${icon ? "px-2" : ""}`}
+    >
+      {children}
+    </Link>
   );
 }

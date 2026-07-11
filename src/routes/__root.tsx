@@ -78,17 +78,15 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: `${BRAND.name} — Groceries, delivered under one promise` },
+      { title: `${BRAND.name} — ${BRAND.tagline}` },
       {
         name: "description",
-        content:
-          "Fresh produce, pantry staples, dairy and everyday essentials — one unified store, one standard, delivered fast.",
+        content: `${BRAND.tagline}. Fresh produce, pantry staples, dairy and everyday essentials from every store on ${BRAND.name} — delivered fast.`,
       },
-      { property: "og:title", content: `${BRAND.name} — Groceries, delivered under one promise` },
+      { property: "og:title", content: `${BRAND.name} — ${BRAND.tagline}` },
       {
         property: "og:description",
-        content:
-          "Fresh produce, pantry staples, dairy and everyday essentials — one unified store, one standard, delivered fast.",
+        content: `${BRAND.tagline}. Fresh produce, pantry staples, dairy and everyday essentials from every store on ${BRAND.name} — delivered fast.`,
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
