@@ -47,6 +47,7 @@ function Index() {
   const totalPages = Math.max(1, Math.ceil(filteredStores.length / PAGE_SIZE));
   const pageItems = filteredStores.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
   const activeCategory = storeCategories.find((c) => c.id === category);
+  const isFiltering = Boolean(category || q);
 
   return (
     <div className="mx-auto max-w-[1440px] px-4 py-6 md:py-10">
@@ -64,35 +65,44 @@ function Index() {
         <HeroCarousel />
       </div>
 
-      {/* All-stores banner strip */}
-      <AllStoresBanner />
+      {/* Marketing sections — hidden while filtering so the result is front-and-center */}
+      {!isFiltering ? (
+        <>
+          {/* All-stores banner strip */}
+          <AllStoresBanner />
 
-      {/* Three wide promo banners */}
-      <PromoBannerRow />
+          {/* Three wide promo banners */}
+          <PromoBannerRow />
 
-      {/* Featured Stores */}
-      {featuredStores.length > 0 ? (
-        <section className="mt-14">
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold md:text-3xl">Featured stores</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Top-rated stores, handpicked for you this week.
-            </p>
-          </div>
-          <StoreGrid stores={featuredStores} />
-        </section>
+          {/* Featured Stores */}
+          {featuredStores.length > 0 ? (
+            <section className="mt-14">
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold md:text-3xl">Featured stores</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Top-rated stores, handpicked for you this week.
+                </p>
+              </div>
+              <StoreGrid stores={featuredStores} />
+            </section>
+          ) : null}
+
+          {/* Four tall promo banners */}
+          <PromoMosaic />
+        </>
       ) : null}
-
-      {/* Four tall promo banners */}
-      <PromoMosaic />
 
       {/* All Stores — filterable, paginated */}
       <section id="all-stores" className="mt-14 scroll-mt-24">
         <div className="mb-6 flex items-end justify-between">
           <div>
-            <h2 className="text-2xl font-bold md:text-3xl">All stores</h2>
+            <h2 className="text-2xl font-bold md:text-3xl">
+              {activeCategory ? activeCategory.name : "All stores"}
+            </h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Browse every store on {BRAND.name}, from groceries to gadgets.
+              {isFiltering
+                ? `${filteredStores.length} ${filteredStores.length === 1 ? "store" : "stores"} found`
+                : `Browse every store on ${BRAND.name}, from groceries to gadgets.`}
             </p>
           </div>
         </div>

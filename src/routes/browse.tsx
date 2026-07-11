@@ -1,7 +1,16 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
-import { ChevronLeft, ChevronRight, LayoutGrid, List, Plus, Minus, SlidersHorizontal, X } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  LayoutGrid,
+  List,
+  Plus,
+  Minus,
+  SlidersHorizontal,
+  X,
+} from "lucide-react";
 import { ProductCard } from "@/components/product-card";
 import { formatPrice } from "@/lib/cart-store";
 import { brands, categories, productColors, products } from "@/lib/mock-data";
@@ -30,13 +39,17 @@ const brandFacets = brands
 const colorFacets = productColors
   .map((c) => ({ ...c, count: products.filter((p) => p.color === c.id).length }))
   .filter((c) => c.count > 0);
+// Price bounds are derived from the catalog (values are stored in INR) so the
+// slider actually spans every product — a hard-coded cap silently hides items
+// and makes brand/color filters look broken when they intersect an empty range.
+const PRICE_MAX = Math.ceil(Math.max(...products.map((p) => p.price)) / 100) * 100;
 
 function Browse() {
   const navigate = useNavigate();
   const { category, q, page, sale, brand } = Route.useSearch();
   const currentPage = page ?? 1;
   const [priceMin, setPriceMin] = useState(0);
-  const [priceMax, setPriceMax] = useState(500);
+  const [priceMax, setPriceMax] = useState(PRICE_MAX);
   const [selectedBrands, setSelectedBrands] = useState<string[]>(brand ? [brand] : []);
 
   // Keep the brand facet in sync when arriving via a ?brand= deep link (e.g. a
@@ -46,7 +59,7 @@ function Browse() {
   }, [brand]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [statusFilters, setStatusFilters] = useState<string[]>([]);
-  const [sort, setSort] = useState<"latest" | "low" | "high" | "rating">("latest");
+  const [sort, setSort] = useState<"grouped" | "low" | "high" | "rating">("grouped");
   const [view, setView] = useState<"grid" | "list">("grid");
   const [openCats, setOpenCats] = useState<string[]>([]);
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -60,7 +73,8 @@ function Browse() {
     if (q) {
       const needle = q.toLowerCase();
       out = out.filter(
-        (p) => p.name.toLowerCase().includes(needle) || p.description.toLowerCase().includes(needle),
+        (p) =>
+          p.name.toLowerCase().includes(needle) || p.description.toLowerCase().includes(needle),
       );
     }
     out = out.filter((p) => p.price >= priceMin && p.price <= priceMax);
@@ -69,8 +83,18 @@ function Browse() {
     if (statusFilters.includes("in_stock")) out = out.filter((p) => p.inStock);
     if (sale || statusFilters.includes("on_sale")) out = out.filter((p) => !!p.compareAtPrice);
     if (sort === "low") out.sort((a, b) => a.price - b.price);
-    if (sort === "high") out.sort((a, b) => b.price - a.price);
-    if (sort === "rating") out.sort((a, b) => b.rating - a.rating);
+    else if (sort === "high") out.sort((a, b) => b.price - a.price);
+    else if (sort === "rating") out.sort((a, b) => b.rating - a.rating);
+    // Default: arrange by category, then brand, then color, then name so the
+    // grid reads as an organized catalog instead of insertion order.
+    else
+      out.sort(
+        (a, b) =>
+          a.categoryId.localeCompare(b.categoryId) ||
+          a.brandId.localeCompare(b.brandId) ||
+          (a.color ?? "").localeCompare(b.color ?? "") ||
+          a.name.localeCompare(b.name),
+      );
     return out;
   }, [category, q, priceMin, priceMax, selectedBrands, selectedColors, statusFilters, sort, sale]);
 
@@ -81,7 +105,9 @@ function Browse() {
   return (
     <div className="mx-auto max-w-[1440px] px-4 py-6">
       <nav className="mb-4 flex items-center gap-2 text-xs text-muted-foreground">
-        <Link to="/" className="hover:text-primary">Home</Link>
+        <Link to="/" className="hover:text-primary">
+          Home
+        </Link>
         <span>/</span>
         <span className={activeCategory ? "" : "text-foreground"}>Shop</span>
         {activeCategory ? (
@@ -130,10 +156,10 @@ function Browse() {
           {/* Price filter */}
           <FilterBlock
             title="Widget price filter"
-            canClear={priceMin > 0 || priceMax < 500}
+            canClear={priceMin > 0 || priceMax < PRICE_MAX}
             onClear={() => {
               setPriceMin(0);
-              setPriceMax(500);
+              setPriceMax(PRICE_MAX);
             }}
           >
             <div className="grid grid-cols-2 gap-2">
@@ -144,17 +170,25 @@ function Browse() {
               <div
                 className="absolute h-1 rounded-full bg-primary"
                 style={{
-                  left: `${(priceMin / 500) * 100}%`,
-                  right: `${100 - (priceMax / 500) * 100}%`,
+                  left: `${(priceMin / PRICE_MAX) * 100}%`,
+                  right: `${100 - (priceMax / PRICE_MAX) * 100}%`,
                 }}
               />
               <input
-                type="range" min={0} max={500} step={10} value={priceMin}
+                type="range"
+                min={0}
+                max={PRICE_MAX}
+                step={50}
+                value={priceMin}
                 onChange={(e) => setPriceMin(Math.min(Number(e.target.value), priceMax))}
                 className="pointer-events-auto absolute -top-1 h-3 w-full appearance-none bg-transparent [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:size-3 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary"
               />
               <input
-                type="range" min={0} max={500} step={10} value={priceMax}
+                type="range"
+                min={0}
+                max={PRICE_MAX}
+                step={50}
+                value={priceMax}
                 onChange={(e) => setPriceMax(Math.max(Number(e.target.value), priceMin))}
                 className="pointer-events-auto absolute -top-1 h-3 w-full appearance-none bg-transparent [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:size-3 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary"
               />
@@ -190,7 +224,11 @@ function Browse() {
                         active ? "text-primary font-semibold" : ""
                       }`}
                     >
-                      <Link to="/browse" search={{ category: c.id }} className="flex-1 hover:text-primary">
+                      <Link
+                        to="/browse"
+                        search={{ category: c.id }}
+                        className="flex-1 hover:text-primary"
+                      >
                         {c.name}
                       </Link>
                       {hasSubs ? (
@@ -248,7 +286,9 @@ function Browse() {
                         />
                         {c.name}
                       </span>
-                      <span className="font-mono text-[11px] text-muted-foreground">({c.count})</span>
+                      <span className="font-mono text-[11px] text-muted-foreground">
+                        ({c.count})
+                      </span>
                     </button>
                   </li>
                 );
@@ -343,8 +383,7 @@ function Browse() {
                 {(currentPage - 1) * PAGE_SIZE + 1}–
                 {Math.min(currentPage * PAGE_SIZE, filtered.length)}
               </span>{" "}
-              of{" "}
-              <span className="font-mono font-semibold text-foreground">{filtered.length}</span>{" "}
+              of <span className="font-mono font-semibold text-foreground">{filtered.length}</span>{" "}
               results
             </p>
             <div className="flex items-center gap-4">
@@ -355,7 +394,7 @@ function Browse() {
                   onChange={(e) => setSort(e.target.value as typeof sort)}
                   className="rounded-md border border-border bg-background px-2 py-1 text-xs"
                 >
-                  <option value="latest">Sort by latest</option>
+                  <option value="grouped">Category, brand &amp; color</option>
                   <option value="low">Price: low to high</option>
                   <option value="high">Price: high to low</option>
                   <option value="rating">Top rated</option>
@@ -523,7 +562,9 @@ function PageBtn({
 }) {
   if (disabled) {
     return (
-      <span className={`grid size-9 place-items-center rounded-md border border-border text-xs text-muted-foreground/50`}>
+      <span
+        className={`grid size-9 place-items-center rounded-md border border-border text-xs text-muted-foreground/50`}
+      >
         {children}
       </span>
     );
