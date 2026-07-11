@@ -32,8 +32,8 @@ const PROMISES: { icon: typeof Sunrise; title: string; body: string }[] = [
   },
   {
     icon: Truck,
-    title: "Before the Chai Cools",
-    body: "Cold-chain packed and on your doorstep across the city in minutes, not days.",
+    title: "Fresh, Fast, Every Time",
+    body: "Cold-chain packed and on your doorstep across the GTA the same day, not days.",
   },
 ];
 
@@ -41,7 +41,7 @@ const STATS: { value: string; label: string }[] = [
   { value: "2.4M", label: "baskets packed & counting" },
   { value: "1,200+", label: "farmers on first-name terms" },
   { value: "38", label: "cities, one single standard" },
-  { value: "9 min", label: "average run to your door" },
+  { value: "Same-day", label: "delivery across the GTA" },
 ];
 
 export function SiteFooter() {
@@ -190,7 +190,7 @@ export function SiteFooter() {
               ["Pantry & Staples", "/browse"],
               ["Dairy & Eggs", "/browse"],
               ["Snack Attack", "/browse"],
-              ["Chai & Beverages", "/browse"],
+              ["Coffee & Beverages", "/browse"],
             ]}
           />
           <FooterCol
@@ -248,13 +248,14 @@ export function SiteFooter() {
 
         <div className="border-t border-border">
           <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-3 px-4 py-4 text-[11px] text-muted-foreground">
-            <p>Packed with care in India 🇮🇳 · Weighed honestly, every single time.</p>
+            <p>Packed with care in Canada 🇨🇦 · Weighed honestly, every single time.</p>
             <div className="flex items-center gap-3 font-mono">
               <span className="rounded bg-muted px-2 py-1 font-bold text-[#1a1f71]">VISA</span>
-              <span className="rounded bg-muted px-2 py-1 font-bold text-[#eb001b]">●●</span>
-              <span className="rounded bg-muted px-2 py-1 font-bold text-primary">UPI</span>
-              <span className="rounded bg-muted px-2 py-1 font-bold text-[#003087]">PayPal</span>
-              <span className="rounded bg-muted px-2 py-1 font-bold text-foreground">COD</span>
+              <span className="rounded bg-muted px-2 py-1 font-bold text-[#eb001b]">MC</span>
+              <span className="rounded bg-muted px-2 py-1 font-bold text-foreground">G Pay</span>
+              <span className="rounded bg-muted px-2 py-1 font-bold text-foreground">
+                Apple Pay
+              </span>
             </div>
             <div className="flex gap-4">
               <Link to="/" className="hover:text-primary">

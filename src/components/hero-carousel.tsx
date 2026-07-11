@@ -50,11 +50,11 @@ const SLIDES: Slide[] = [
   },
   {
     kind: "product",
-    eyebrow: "Farm to doorstep in 18 minutes",
+    eyebrow: "Farm to doorstep, fresh daily",
     title: "Fresh fruits & veggies, picked this morning",
     subtitle: "Sourced daily from local farms. No cold storage, no middlemen.",
     productId: "am-avocado",
-    chips: ["100% Organic", "Free over $6"],
+    chips: ["100% Organic", "Free over $35"],
     cta: { label: "Shop fresh produce", to: "/browse", search: { category: "fruits-veg" } },
     bg: "linear-gradient(120deg, #eaf6e6 0%, #f6fbf2 55%, #fbfdf8 100%)",
     accent: "#4d8b3f",

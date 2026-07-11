@@ -1,8 +1,9 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { Plus, Minus, X, ShoppingBag } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useCart, formatPrice } from "@/lib/cart-store";
 import { getProduct } from "@/lib/mock-data";
+import { CheckoutConfirm } from "@/components/checkout-confirm";
 
 export function CartDrawer() {
   const { items, subtotal, drawerOpen, setDrawerOpen, setQty, remove } = useCart();
@@ -16,8 +17,17 @@ export function CartDrawer() {
     };
   }, [drawerOpen]);
 
-  const deliveryFree = subtotal >= 499;
-  const toFree = Math.max(0, 499 - subtotal);
+  const navigate = useNavigate();
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  // Amounts are INR (÷83 on display): free delivery over ~$35.
+  const deliveryFree = subtotal >= 2905;
+  const toFree = Math.max(0, 2905 - subtotal);
+
+  const proceedToCheckout = () => {
+    setConfirmOpen(false);
+    setDrawerOpen(false);
+    navigate({ to: "/checkout" });
+  };
 
   return (
     <>
@@ -140,13 +150,12 @@ export function CartDrawer() {
                 <span className="text-muted-foreground">Subtotal</span>
                 <span className="font-mono text-base font-semibold">{formatPrice(subtotal)}</span>
               </div>
-              <Link
-                to="/checkout"
-                onClick={() => setDrawerOpen(false)}
+              <button
+                onClick={() => setConfirmOpen(true)}
                 className="mt-4 grid w-full place-items-center rounded-lg bg-primary py-3 text-sm font-semibold text-primary-foreground transition-transform hover:-translate-y-px"
               >
-                Checkout — {formatPrice(subtotal + (deliveryFree ? 0 : 29))}
-              </Link>
+                Checkout — {formatPrice(subtotal + (deliveryFree ? 0 : 414))}
+              </button>
               <Link
                 to="/cart"
                 onClick={() => setDrawerOpen(false)}
@@ -158,6 +167,14 @@ export function CartDrawer() {
           </>
         )}
       </aside>
+
+      <CheckoutConfirm
+        open={confirmOpen}
+        itemCount={items.length}
+        subtotal={subtotal}
+        onConfirm={proceedToCheckout}
+        onClose={() => setConfirmOpen(false)}
+      />
     </>
   );
 }

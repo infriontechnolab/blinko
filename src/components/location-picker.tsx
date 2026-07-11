@@ -6,10 +6,10 @@ type Coords = { lat: number; lon: number };
 // A few preset delivery areas with rough coordinates for the map preview.
 const PRESETS: { label: string; coords: Coords }[] = [
   { label: "21 Queen Mary Drive, Brampton ON L7A 1X7", coords: { lat: 43.7305, lon: -79.7791 } },
-  { label: "Connaught Place, Delhi", coords: { lat: 28.6315, lon: 77.2167 } },
-  { label: "Cyber Hub, Gurugram", coords: { lat: 28.4949, lon: 77.089 } },
-  { label: "Bandra, Mumbai", coords: { lat: 19.0596, lon: 72.8295 } },
-  { label: "Koramangala, Bengaluru", coords: { lat: 12.9352, lon: 77.6245 } },
+  { label: "Downtown Brampton, ON", coords: { lat: 43.6852, lon: -79.7599 } },
+  { label: "Mississauga City Centre, ON", coords: { lat: 43.589, lon: -79.6441 } },
+  { label: "Downtown Toronto, ON", coords: { lat: 43.6532, lon: -79.3832 } },
+  { label: "Etobicoke, ON", coords: { lat: 43.6205, lon: -79.5132 } },
 ];
 
 function osmEmbed({ lat, lon }: Coords) {

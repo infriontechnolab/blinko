@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Clock } from "lucide-react";
+import { MapPin } from "lucide-react";
 import type { Store } from "@/lib/mock-data";
 
 /**
@@ -42,8 +42,8 @@ export function StoreCard({ store }: { store: Store }) {
         </h3>
         <p className="line-clamp-1 text-xs text-muted-foreground">{store.tagline}</p>
         <p className="mt-0.5 flex items-center gap-1 text-[11px] text-muted-foreground">
-          <Clock className="size-3" />
-          {store.deliveryTime}
+          <MapPin className="size-3" />
+          {store.distanceKm} km · Free over ${store.freeDeliveryThreshold}
         </p>
       </div>
     </Link>

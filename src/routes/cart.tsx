@@ -1,7 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
+import { useState } from "react";
 import { useCart, formatPrice } from "@/lib/cart-store";
 import { getProduct } from "@/lib/mock-data";
+import { CheckoutConfirm } from "@/components/checkout-confirm";
 import { BRAND } from "@/lib/brand";
 
 export const Route = createFileRoute("/cart")({
@@ -10,9 +12,17 @@ export const Route = createFileRoute("/cart")({
 });
 
 function CartPage() {
+  const navigate = useNavigate();
   const { items, subtotal, setQty, remove } = useCart();
-  const deliveryFee = subtotal >= 499 || subtotal === 0 ? 0 : 29;
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  // Amounts are INR (÷83 on display): free delivery over ~$35, else a ~$4.99 fee.
+  const deliveryFee = subtotal >= 2905 || subtotal === 0 ? 0 : 414;
   const total = subtotal + deliveryFee;
+
+  const proceedToCheckout = () => {
+    setConfirmOpen(false);
+    navigate({ to: "/checkout" });
+  };
 
   if (items.length === 0) {
     return (
@@ -135,12 +145,12 @@ function CartPage() {
             <span className="font-heading text-lg font-bold">Total</span>
             <span className="font-mono text-2xl font-bold">{formatPrice(total)}</span>
           </div>
-          <Link
-            to="/checkout"
+          <button
+            onClick={() => setConfirmOpen(true)}
             className="mt-6 grid w-full place-items-center rounded-lg bg-primary py-3 text-sm font-semibold text-primary-foreground transition-transform hover:-translate-y-px"
           >
             Proceed to checkout
-          </Link>
+          </button>
           <Link
             to="/browse"
             className="mt-2 grid w-full place-items-center rounded-lg border border-border py-2.5 text-xs font-semibold"
@@ -149,6 +159,14 @@ function CartPage() {
           </Link>
         </aside>
       </div>
+
+      <CheckoutConfirm
+        open={confirmOpen}
+        itemCount={items.length}
+        subtotal={subtotal}
+        onConfirm={proceedToCheckout}
+        onClose={() => setConfirmOpen(false)}
+      />
     </div>
   );
 }

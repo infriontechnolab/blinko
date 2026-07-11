@@ -5,6 +5,7 @@ import type { Product } from "@/lib/mock-data";
 import { discountPct } from "@/lib/mock-data";
 import { useCart, formatPrice } from "@/lib/cart-store";
 import { useWishlist } from "@/lib/wishlist-store";
+import { onImgError } from "@/lib/img";
 
 const badgeStyles: Record<string, { label: string; className: string }> = {
   organic: { label: "Organic", className: "bg-success text-success-foreground" },
@@ -123,6 +124,7 @@ export function ProductCard({
           src={product.image}
           alt={product.name}
           loading="lazy"
+          onError={onImgError}
           className="size-full object-contain transition-transform duration-500 group-hover:scale-105"
         />
 

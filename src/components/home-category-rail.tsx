@@ -14,6 +14,7 @@ import {
   House,
   PenLine,
   Leaf,
+  BadgePercent,
   type LucideIcon,
 } from "lucide-react";
 import { storeCategories } from "@/lib/mock-data";
@@ -39,6 +40,15 @@ export function HomeCategoryRail() {
   return (
     <nav className="overflow-hidden rounded-md border border-border bg-surface">
       <ul>
+        <li className="border-b border-border">
+          <Link
+            to="/offers"
+            className="flex items-center gap-3 border-l-2 border-transparent bg-sale/5 px-4 py-2.5 text-sm font-semibold text-sale transition-colors hover:border-sale hover:bg-sale/10"
+          >
+            <BadgePercent className="size-4 shrink-0" />
+            <span className="flex-1">Offers</span>
+          </Link>
+        </li>
         {storeCategories.map((c) => {
           const Icon = storeCategoryIcons[c.id] ?? ShoppingBasket;
           return (

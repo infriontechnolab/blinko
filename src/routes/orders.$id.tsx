@@ -127,7 +127,7 @@ function OrderDetail() {
               <p className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
                 Delivery partner
               </p>
-              <p className="font-semibold">{BRAND.name} Rider · +91 ••••• ••210</p>
+              <p className="font-semibold">{BRAND.name} Rider · +1 ••• ••• 0210</p>
             </div>
           </div>
         </section>

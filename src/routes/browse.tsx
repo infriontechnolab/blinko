@@ -1,5 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import { ChevronLeft, ChevronRight, LayoutGrid, List, Plus, Minus, SlidersHorizontal, X } from "lucide-react";
 import { ProductCard } from "@/components/product-card";
@@ -11,6 +11,7 @@ const search = z.object({
   q: z.string().optional(),
   page: z.coerce.number().optional(),
   sale: z.coerce.boolean().optional(),
+  brand: z.string().optional(),
 });
 
 export const Route = createFileRoute("/browse")({
@@ -31,11 +32,18 @@ const colorFacets = productColors
   .filter((c) => c.count > 0);
 
 function Browse() {
-  const { category, q, page, sale } = Route.useSearch();
+  const navigate = useNavigate();
+  const { category, q, page, sale, brand } = Route.useSearch();
   const currentPage = page ?? 1;
   const [priceMin, setPriceMin] = useState(0);
   const [priceMax, setPriceMax] = useState(500);
-  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+  const [selectedBrands, setSelectedBrands] = useState<string[]>(brand ? [brand] : []);
+
+  // Keep the brand facet in sync when arriving via a ?brand= deep link (e.g. a
+  // brand pick from the header search) even if the page is already mounted.
+  useEffect(() => {
+    if (brand) setSelectedBrands([brand]);
+  }, [brand]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [statusFilters, setStatusFilters] = useState<string[]>([]);
   const [sort, setSort] = useState<"latest" | "low" | "high" | "rating">("latest");
@@ -120,7 +128,14 @@ function Browse() {
             </button>
           </div>
           {/* Price filter */}
-          <FilterBlock title="Widget price filter">
+          <FilterBlock
+            title="Widget price filter"
+            canClear={priceMin > 0 || priceMax < 500}
+            onClear={() => {
+              setPriceMin(0);
+              setPriceMax(500);
+            }}
+          >
             <div className="grid grid-cols-2 gap-2">
               <PriceInput label="Min price" value={priceMin} onChange={setPriceMin} />
               <PriceInput label="Max price" value={priceMax} onChange={setPriceMax} />
@@ -158,7 +173,11 @@ function Browse() {
           </FilterBlock>
 
           {/* Product Categories */}
-          <FilterBlock title="Product Categories">
+          <FilterBlock
+            title="Product Categories"
+            canClear={!!category}
+            onClear={() => navigate({ to: "/browse", search: { q } })}
+          >
             <ul className="space-y-1">
               {categories.map((c) => {
                 const open = openCats.includes(c.id);
@@ -206,7 +225,11 @@ function Browse() {
           </FilterBlock>
 
           {/* Colors */}
-          <FilterBlock title="Filter by Color">
+          <FilterBlock
+            title="Filter by Color"
+            canClear={selectedColors.length > 0}
+            onClear={() => setSelectedColors([])}
+          >
             <ul className="space-y-2">
               {colorFacets.map((c) => {
                 const active = selectedColors.includes(c.id);
@@ -234,7 +257,14 @@ function Browse() {
           </FilterBlock>
 
           {/* Brands */}
-          <FilterBlock title="Filter by Brands">
+          <FilterBlock
+            title="Filter by Brands"
+            canClear={selectedBrands.length > 0}
+            onClear={() => {
+              setSelectedBrands([]);
+              if (brand) navigate({ to: "/browse", search: { q, category } });
+            }}
+          >
             <ul className="space-y-2">
               {brandFacets.map((b) => {
                 const active = selectedBrands.includes(b.id);
@@ -257,7 +287,14 @@ function Browse() {
           </FilterBlock>
 
           {/* Status */}
-          <FilterBlock title="Product Status">
+          <FilterBlock
+            title="Product Status"
+            canClear={statusFilters.length > 0 || !!sale}
+            onClear={() => {
+              setStatusFilters([]);
+              if (sale) navigate({ to: "/browse", search: { q, category } });
+            }}
+          >
             <ul className="space-y-2">
               {[
                 { id: "in_stock", label: "In Stock" },
@@ -416,10 +453,30 @@ function Browse() {
   );
 }
 
-function FilterBlock({ title, children }: { title: string; children: React.ReactNode }) {
+function FilterBlock({
+  title,
+  children,
+  canClear,
+  onClear,
+}: {
+  title: string;
+  children: React.ReactNode;
+  canClear?: boolean;
+  onClear?: () => void;
+}) {
   return (
     <section className="rounded-xl border border-border bg-surface p-4">
-      <h3 className="mb-3 border-b border-border pb-2 text-sm font-bold">{title}</h3>
+      <div className="mb-3 flex items-center justify-between gap-2 border-b border-border pb-2">
+        <h3 className="text-sm font-bold">{title}</h3>
+        {canClear && onClear ? (
+          <button
+            onClick={onClear}
+            className="inline-flex items-center gap-1 text-[11px] font-semibold text-muted-foreground transition-colors hover:text-primary"
+          >
+            <X className="size-3" /> Clear
+          </button>
+        ) : null}
+      </div>
       {children}
     </section>
   );

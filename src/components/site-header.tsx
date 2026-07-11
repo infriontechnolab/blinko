@@ -11,6 +11,7 @@ import {
   LayoutGrid,
   TrendingUp,
   Star,
+  Tag,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useCart, formatPrice } from "@/lib/cart-store";
@@ -19,7 +20,7 @@ import { CartDrawer } from "@/components/cart-drawer";
 import { LocationPicker } from "@/components/location-picker";
 import { usePersistentState } from "@/hooks/use-persistent-state";
 import { useCategoriesPanel } from "@/lib/categories-panel";
-import { categories, products, stores } from "@/lib/mock-data";
+import { brands, categories, products, stores } from "@/lib/mock-data";
 import { storeLogoUrl } from "@/components/store-card";
 import { BRAND } from "@/lib/brand";
 
@@ -60,7 +61,8 @@ export function SiteHeader() {
   const [searchFocus, setSearchFocus] = useState(false);
   const [mobileCat, setMobileCat] = useState<string | null>(null);
   const [location, setLocation] = usePersistentState<string>(
-    "blinko-location",
+    // v2: drop any older persisted value (e.g. a India address from earlier testing).
+    "blinko-location-v2",
     "21 Queen Mary Drive, Brampton ON L7A 1X7",
     isString,
   );
@@ -74,11 +76,7 @@ export function SiteHeader() {
 
   const runSearch = () => {
     const query = q.trim();
-    if (isHome) {
-      navigate({ to: "/", search: query ? { q: query } : {} });
-    } else {
-      navigate({ to: "/browse", search: query ? { q: query } : {} });
-    }
+    navigate({ to: "/browse", search: query ? { q: query } : {} });
     setMobileNav(false);
     setSearchFocus(false);
   };
@@ -88,15 +86,35 @@ export function SiteHeader() {
     runSearch();
   };
 
+  const closeSuggestions = () => {
+    setSearchFocus(false);
+    setQ("");
+  };
+
+  // Unified search across stores, products, categories and brands.
   const needle = q.trim().toLowerCase();
-  const storeSuggestions =
-    needle.length >= 2
-      ? stores.filter((v) => v.name.toLowerCase().includes(needle)).slice(0, 6)
-      : [];
-  const productSuggestions =
-    needle.length >= 2
-      ? products.filter((p) => p.name.toLowerCase().includes(needle)).slice(0, 6)
-      : [];
+  const hasQuery = needle.length >= 2;
+  const storeSuggestions = hasQuery
+    ? stores
+        .filter(
+          (v) => v.name.toLowerCase().includes(needle) || v.tagline.toLowerCase().includes(needle),
+        )
+        .slice(0, 4)
+    : [];
+  const productSuggestions = hasQuery
+    ? products.filter((p) => p.name.toLowerCase().includes(needle)).slice(0, 4)
+    : [];
+  const categorySuggestions = hasQuery
+    ? categories.filter((c) => c.name.toLowerCase().includes(needle)).slice(0, 4)
+    : [];
+  const brandSuggestions = hasQuery
+    ? brands.filter((b) => b.name.toLowerCase().includes(needle)).slice(0, 4)
+    : [];
+  const suggestionCount =
+    storeSuggestions.length +
+    productSuggestions.length +
+    categorySuggestions.length +
+    brandSuggestions.length;
 
   const isActive = (to: string, sc?: { category?: string }) => {
     if (to !== pathname) return false;
@@ -175,9 +193,14 @@ export function SiteHeader() {
               alt={`${BRAND.name} logo`}
               className="size-10 shrink-0 rounded-xl object-contain"
             />
-            <span className="text-2xl font-extrabold leading-none tracking-tight">
-              <span className="text-foreground">{BRAND.wordmarkPrefix}</span>
-              <span className="text-primary">{BRAND.wordmarkSuffix}</span>
+            <span className="flex flex-col leading-none">
+              <span className="text-2xl font-extrabold leading-none tracking-tight">
+                <span className="text-foreground">{BRAND.wordmarkPrefix}</span>
+                <span className="text-primary">{BRAND.wordmarkSuffix}</span>
+              </span>
+              <span className="mt-1 hidden text-[10px] font-medium text-muted-foreground lg:block">
+                {BRAND.tagline}
+              </span>
             </span>
           </Link>
 
@@ -203,15 +226,9 @@ export function SiteHeader() {
                 onChange={(e) => setQ(e.target.value)}
                 onFocus={() => setSearchFocus(true)}
                 onBlur={() => setTimeout(() => setSearchFocus(false), 150)}
-                placeholder={
-                  isHome
-                    ? "Search stores, categories…"
-                    : "Search for products, categories or brands…"
-                }
-                aria-label="Search the store"
-                aria-expanded={
-                  searchFocus && (isHome ? storeSuggestions.length : productSuggestions.length) > 0
-                }
+                placeholder="Search stores, products, categories or brands…"
+                aria-label="Search stores, products, categories and brands"
+                aria-expanded={searchFocus && suggestionCount > 0}
                 className="h-11 w-full rounded-full border border-border bg-surface pl-5 pr-32 text-sm outline-none transition-shadow focus:border-primary focus:ring-2 focus:ring-primary/15"
               />
               <button
@@ -223,78 +240,110 @@ export function SiteHeader() {
                 <span className="hidden lg:inline">Search</span>
               </button>
 
-              {/* Live suggestions */}
-              {searchFocus && isHome && storeSuggestions.length > 0 ? (
+              {/* Unified live suggestions: stores, products, categories, brands */}
+              {searchFocus && suggestionCount > 0 ? (
                 <div className="absolute left-0 right-0 top-full z-50 mt-2 overflow-hidden rounded-2xl border border-border bg-surface shadow-xl">
-                  <ul className="max-h-96 overflow-y-auto py-1">
-                    {storeSuggestions.map((v) => (
-                      <li key={v.id}>
-                        <button
-                          type="button"
-                          onMouseDown={(e) => {
-                            e.preventDefault();
-                            setSearchFocus(false);
-                            setQ("");
-                            navigate({ to: "/store/$slug", params: { slug: v.slug } });
-                          }}
-                          className="flex w-full items-center gap-3 px-3 py-2 text-left hover:bg-muted"
-                        >
-                          <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-white p-1.5">
+                  <div className="max-h-96 overflow-y-auto py-1">
+                    {storeSuggestions.length > 0 ? (
+                      <SuggestGroup label="Stores">
+                        {storeSuggestions.map((v) => (
+                          <button
+                            key={v.id}
+                            type="button"
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              closeSuggestions();
+                              navigate({ to: "/store/$slug", params: { slug: v.slug } });
+                            }}
+                            className="flex w-full items-center gap-3 px-3 py-2 text-left hover:bg-muted"
+                          >
+                            <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-white p-1.5">
+                              <img
+                                src={storeLogoUrl(v)}
+                                alt=""
+                                loading="lazy"
+                                className="size-full object-contain"
+                              />
+                            </span>
+                            <span className="min-w-0 flex-1 truncate text-sm">{v.name}</span>
+                            <span className="shrink-0 text-xs text-muted-foreground">Store</span>
+                          </button>
+                        ))}
+                      </SuggestGroup>
+                    ) : null}
+                    {productSuggestions.length > 0 ? (
+                      <SuggestGroup label="Products">
+                        {productSuggestions.map((p) => (
+                          <button
+                            key={p.id}
+                            type="button"
+                            // Navigate on mousedown so it wins the race against the
+                            // input's onBlur timer that closes this dropdown.
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              closeSuggestions();
+                              navigate({ to: "/products/$id", params: { id: p.id } });
+                            }}
+                            className="flex w-full items-center gap-3 px-3 py-2 text-left hover:bg-muted"
+                          >
                             <img
-                              src={storeLogoUrl(v)}
+                              src={p.image}
                               alt=""
-                              loading="lazy"
-                              className="size-full object-contain"
+                              className="size-9 shrink-0 rounded-lg object-cover"
                             />
-                          </span>
-                          <span className="min-w-0 flex-1 truncate text-sm">{v.name}</span>
-                          <span className="shrink-0 text-xs text-muted-foreground">
-                            {v.tagline}
-                          </span>
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                  <button
-                    type="button"
-                    onMouseDown={(e) => e.preventDefault()}
-                    onClick={runSearch}
-                    className="flex w-full items-center gap-2 border-t border-border px-3 py-2.5 text-sm font-semibold text-primary hover:bg-muted"
-                  >
-                    <Search className="size-4" /> See all results for “{q.trim()}”
-                  </button>
-                </div>
-              ) : null}
-              {searchFocus && !isHome && productSuggestions.length > 0 ? (
-                <div className="absolute left-0 right-0 top-full z-50 mt-2 overflow-hidden rounded-2xl border border-border bg-surface shadow-xl">
-                  <ul className="max-h-96 overflow-y-auto py-1">
-                    {productSuggestions.map((p) => (
-                      <li key={p.id}>
-                        <button
-                          type="button"
-                          // Navigate on mousedown so it wins the race against the
-                          // input's onBlur timer that closes this dropdown.
-                          onMouseDown={(e) => {
-                            e.preventDefault();
-                            setSearchFocus(false);
-                            setQ("");
-                            navigate({ to: "/products/$id", params: { id: p.id } });
-                          }}
-                          className="flex w-full items-center gap-3 px-3 py-2 text-left hover:bg-muted"
-                        >
-                          <img
-                            src={p.image}
-                            alt=""
-                            className="size-10 shrink-0 rounded-lg object-cover"
-                          />
-                          <span className="min-w-0 flex-1 truncate text-sm">{p.name}</span>
-                          <span className="shrink-0 text-sm font-semibold">
-                            {formatPrice(p.price)}
-                          </span>
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
+                            <span className="min-w-0 flex-1 truncate text-sm">{p.name}</span>
+                            <span className="shrink-0 text-sm font-semibold">
+                              {formatPrice(p.price)}
+                            </span>
+                          </button>
+                        ))}
+                      </SuggestGroup>
+                    ) : null}
+                    {categorySuggestions.length > 0 ? (
+                      <SuggestGroup label="Categories">
+                        {categorySuggestions.map((c) => (
+                          <button
+                            key={c.id}
+                            type="button"
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              closeSuggestions();
+                              navigate({ to: "/browse", search: { category: c.id } });
+                            }}
+                            className="flex w-full items-center gap-3 px-3 py-2 text-left hover:bg-muted"
+                          >
+                            <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-muted">
+                              <LayoutGrid className="size-4 text-primary" />
+                            </span>
+                            <span className="min-w-0 flex-1 truncate text-sm">{c.name}</span>
+                            <span className="shrink-0 text-xs text-muted-foreground">Category</span>
+                          </button>
+                        ))}
+                      </SuggestGroup>
+                    ) : null}
+                    {brandSuggestions.length > 0 ? (
+                      <SuggestGroup label="Brands">
+                        {brandSuggestions.map((b) => (
+                          <button
+                            key={b.id}
+                            type="button"
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              closeSuggestions();
+                              navigate({ to: "/browse", search: { brand: b.id } });
+                            }}
+                            className="flex w-full items-center gap-3 px-3 py-2 text-left hover:bg-muted"
+                          >
+                            <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-muted">
+                              <Tag className="size-4 text-primary" />
+                            </span>
+                            <span className="min-w-0 flex-1 truncate text-sm">{b.name}</span>
+                            <span className="shrink-0 text-xs text-muted-foreground">Brand</span>
+                          </button>
+                        ))}
+                      </SuggestGroup>
+                    ) : null}
+                  </div>
                   <button
                     type="button"
                     onMouseDown={(e) => e.preventDefault()}
@@ -357,8 +406,8 @@ export function SiteHeader() {
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Search the store…"
-              aria-label="Search the store"
+              placeholder="Search stores, products, brands…"
+              aria-label="Search stores, products, categories and brands"
               className="h-10 w-full rounded-full border border-border bg-muted pl-10 pr-4 text-sm outline-none focus:border-primary"
             />
           </form>
@@ -545,6 +594,17 @@ export function SiteHeader() {
         }}
       />
     </>
+  );
+}
+
+function SuggestGroup({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="py-1">
+      <p className="px-3 pb-1 pt-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+        {label}
+      </p>
+      {children}
+    </div>
   );
 }
 

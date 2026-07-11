@@ -131,20 +131,20 @@ function PDP() {
     ["Category", category?.name ?? product.categoryId],
     ["Pack size", product.unit],
     ["Storage", "Refrigerate on arrival"],
-    ["Country of origin", "India"],
+    ["Country of origin", "Canada"],
     ["Shelf life", "Best within 5–7 days"],
   ];
 
   const infoCards = [
     {
       icon: Truck,
-      title: "Delivery in 18 minutes.",
-      text: "Free on orders over $6. Fresh from the nearest store to your door.",
+      title: "Fast, reliable delivery.",
+      text: "Free on orders over $35. Fresh from the nearest store to your door.",
     },
     {
       icon: CreditCard,
       title: "Flexible payment.",
-      text: "UPI, cards, wallets, or cash on delivery — pick what suits you at checkout.",
+      text: "Google Pay, Apple Pay, or credit / debit — pick what suits you at checkout.",
     },
     {
       icon: ShieldCheck,
