@@ -3,6 +3,7 @@ import {
   Link,
   createRootRoute,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -17,6 +18,7 @@ import { BRAND } from "@/lib/brand";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Toaster } from "@/components/ui/sonner";
+import { isVendorPortalPath } from "@/lib/store/vendor-routes";
 
 function NotFoundComponent() {
   return (
@@ -123,17 +125,20 @@ function RootShell({ children }: { children: ReactNode }) {
 }
 
 function RootComponent() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isVendorPortal = isVendorPortalPath(pathname);
+
   return (
     <CartProvider>
       <WishlistProvider>
         <OrdersProvider>
           <CategoriesPanelProvider>
             <div className="flex min-h-screen flex-col bg-background">
-              <SiteHeader />
+              {!isVendorPortal ? <SiteHeader /> : null}
               <main className="flex-1">
                 <Outlet />
               </main>
-              <SiteFooter />
+              {!isVendorPortal ? <SiteFooter /> : null}
               <Toaster position="bottom-center" />
             </div>
           </CategoriesPanelProvider>

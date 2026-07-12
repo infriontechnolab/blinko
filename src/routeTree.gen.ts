@@ -16,9 +16,18 @@ import { Route as CartRouteImport } from './routes/cart'
 import { Route as BrowseRouteImport } from './routes/browse'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OrdersIndexRouteImport } from './routes/orders.index'
+import { Route as StoreSlotsRouteImport } from './routes/store.slots'
+import { Route as StoreReportsRouteImport } from './routes/store.reports'
+import { Route as StoreProfileRouteImport } from './routes/store.profile'
+import { Route as StoreProductsRouteImport } from './routes/store.products'
+import { Route as StoreLoginRouteImport } from './routes/store.login'
+import { Route as StoreInventoryRouteImport } from './routes/store.inventory'
+import { Route as StoreDashboardRouteImport } from './routes/store.dashboard'
+import { Route as StoreCouponsRouteImport } from './routes/store.coupons'
 import { Route as StoreSlugRouteImport } from './routes/store.$slug'
 import { Route as ProductsIdRouteImport } from './routes/products.$id'
 import { Route as OrdersIdRouteImport } from './routes/orders.$id'
+import { Route as StoreOrdersIndexRouteImport } from './routes/store/orders/index'
 
 const WishlistRoute = WishlistRouteImport.update({
   id: '/wishlist',
@@ -55,6 +64,46 @@ const OrdersIndexRoute = OrdersIndexRouteImport.update({
   path: '/orders/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StoreSlotsRoute = StoreSlotsRouteImport.update({
+  id: '/store/slots',
+  path: '/store/slots',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StoreReportsRoute = StoreReportsRouteImport.update({
+  id: '/store/reports',
+  path: '/store/reports',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StoreProfileRoute = StoreProfileRouteImport.update({
+  id: '/store/profile',
+  path: '/store/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StoreProductsRoute = StoreProductsRouteImport.update({
+  id: '/store/products',
+  path: '/store/products',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StoreLoginRoute = StoreLoginRouteImport.update({
+  id: '/store/login',
+  path: '/store/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StoreInventoryRoute = StoreInventoryRouteImport.update({
+  id: '/store/inventory',
+  path: '/store/inventory',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StoreDashboardRoute = StoreDashboardRouteImport.update({
+  id: '/store/dashboard',
+  path: '/store/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StoreCouponsRoute = StoreCouponsRouteImport.update({
+  id: '/store/coupons',
+  path: '/store/coupons',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StoreSlugRoute = StoreSlugRouteImport.update({
   id: '/store/$slug',
   path: '/store/$slug',
@@ -70,6 +119,11 @@ const OrdersIdRoute = OrdersIdRouteImport.update({
   path: '/orders/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StoreOrdersIndexRoute = StoreOrdersIndexRouteImport.update({
+  id: '/store/orders/',
+  path: '/store/orders/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -81,7 +135,16 @@ export interface FileRoutesByFullPath {
   '/orders/$id': typeof OrdersIdRoute
   '/products/$id': typeof ProductsIdRoute
   '/store/$slug': typeof StoreSlugRoute
+  '/store/coupons': typeof StoreCouponsRoute
+  '/store/dashboard': typeof StoreDashboardRoute
+  '/store/inventory': typeof StoreInventoryRoute
+  '/store/login': typeof StoreLoginRoute
+  '/store/products': typeof StoreProductsRoute
+  '/store/profile': typeof StoreProfileRoute
+  '/store/reports': typeof StoreReportsRoute
+  '/store/slots': typeof StoreSlotsRoute
   '/orders/': typeof OrdersIndexRoute
+  '/store/orders/': typeof StoreOrdersIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -93,7 +156,16 @@ export interface FileRoutesByTo {
   '/orders/$id': typeof OrdersIdRoute
   '/products/$id': typeof ProductsIdRoute
   '/store/$slug': typeof StoreSlugRoute
+  '/store/coupons': typeof StoreCouponsRoute
+  '/store/dashboard': typeof StoreDashboardRoute
+  '/store/inventory': typeof StoreInventoryRoute
+  '/store/login': typeof StoreLoginRoute
+  '/store/products': typeof StoreProductsRoute
+  '/store/profile': typeof StoreProfileRoute
+  '/store/reports': typeof StoreReportsRoute
+  '/store/slots': typeof StoreSlotsRoute
   '/orders': typeof OrdersIndexRoute
+  '/store/orders': typeof StoreOrdersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -106,7 +178,16 @@ export interface FileRoutesById {
   '/orders/$id': typeof OrdersIdRoute
   '/products/$id': typeof ProductsIdRoute
   '/store/$slug': typeof StoreSlugRoute
+  '/store/coupons': typeof StoreCouponsRoute
+  '/store/dashboard': typeof StoreDashboardRoute
+  '/store/inventory': typeof StoreInventoryRoute
+  '/store/login': typeof StoreLoginRoute
+  '/store/products': typeof StoreProductsRoute
+  '/store/profile': typeof StoreProfileRoute
+  '/store/reports': typeof StoreReportsRoute
+  '/store/slots': typeof StoreSlotsRoute
   '/orders/': typeof OrdersIndexRoute
+  '/store/orders/': typeof StoreOrdersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -120,7 +201,16 @@ export interface FileRouteTypes {
     | '/orders/$id'
     | '/products/$id'
     | '/store/$slug'
+    | '/store/coupons'
+    | '/store/dashboard'
+    | '/store/inventory'
+    | '/store/login'
+    | '/store/products'
+    | '/store/profile'
+    | '/store/reports'
+    | '/store/slots'
     | '/orders/'
+    | '/store/orders/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -132,7 +222,16 @@ export interface FileRouteTypes {
     | '/orders/$id'
     | '/products/$id'
     | '/store/$slug'
+    | '/store/coupons'
+    | '/store/dashboard'
+    | '/store/inventory'
+    | '/store/login'
+    | '/store/products'
+    | '/store/profile'
+    | '/store/reports'
+    | '/store/slots'
     | '/orders'
+    | '/store/orders'
   id:
     | '__root__'
     | '/'
@@ -144,7 +243,16 @@ export interface FileRouteTypes {
     | '/orders/$id'
     | '/products/$id'
     | '/store/$slug'
+    | '/store/coupons'
+    | '/store/dashboard'
+    | '/store/inventory'
+    | '/store/login'
+    | '/store/products'
+    | '/store/profile'
+    | '/store/reports'
+    | '/store/slots'
     | '/orders/'
+    | '/store/orders/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -157,7 +265,16 @@ export interface RootRouteChildren {
   OrdersIdRoute: typeof OrdersIdRoute
   ProductsIdRoute: typeof ProductsIdRoute
   StoreSlugRoute: typeof StoreSlugRoute
+  StoreCouponsRoute: typeof StoreCouponsRoute
+  StoreDashboardRoute: typeof StoreDashboardRoute
+  StoreInventoryRoute: typeof StoreInventoryRoute
+  StoreLoginRoute: typeof StoreLoginRoute
+  StoreProductsRoute: typeof StoreProductsRoute
+  StoreProfileRoute: typeof StoreProfileRoute
+  StoreReportsRoute: typeof StoreReportsRoute
+  StoreSlotsRoute: typeof StoreSlotsRoute
   OrdersIndexRoute: typeof OrdersIndexRoute
+  StoreOrdersIndexRoute: typeof StoreOrdersIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -211,6 +328,62 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OrdersIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/store/slots': {
+      id: '/store/slots'
+      path: '/store/slots'
+      fullPath: '/store/slots'
+      preLoaderRoute: typeof StoreSlotsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/store/reports': {
+      id: '/store/reports'
+      path: '/store/reports'
+      fullPath: '/store/reports'
+      preLoaderRoute: typeof StoreReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/store/profile': {
+      id: '/store/profile'
+      path: '/store/profile'
+      fullPath: '/store/profile'
+      preLoaderRoute: typeof StoreProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/store/products': {
+      id: '/store/products'
+      path: '/store/products'
+      fullPath: '/store/products'
+      preLoaderRoute: typeof StoreProductsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/store/login': {
+      id: '/store/login'
+      path: '/store/login'
+      fullPath: '/store/login'
+      preLoaderRoute: typeof StoreLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/store/inventory': {
+      id: '/store/inventory'
+      path: '/store/inventory'
+      fullPath: '/store/inventory'
+      preLoaderRoute: typeof StoreInventoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/store/dashboard': {
+      id: '/store/dashboard'
+      path: '/store/dashboard'
+      fullPath: '/store/dashboard'
+      preLoaderRoute: typeof StoreDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/store/coupons': {
+      id: '/store/coupons'
+      path: '/store/coupons'
+      fullPath: '/store/coupons'
+      preLoaderRoute: typeof StoreCouponsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/store/$slug': {
       id: '/store/$slug'
       path: '/store/$slug'
@@ -232,6 +405,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OrdersIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/store/orders/': {
+      id: '/store/orders/'
+      path: '/store/orders'
+      fullPath: '/store/orders/'
+      preLoaderRoute: typeof StoreOrdersIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -245,7 +425,16 @@ const rootRouteChildren: RootRouteChildren = {
   OrdersIdRoute: OrdersIdRoute,
   ProductsIdRoute: ProductsIdRoute,
   StoreSlugRoute: StoreSlugRoute,
+  StoreCouponsRoute: StoreCouponsRoute,
+  StoreDashboardRoute: StoreDashboardRoute,
+  StoreInventoryRoute: StoreInventoryRoute,
+  StoreLoginRoute: StoreLoginRoute,
+  StoreProductsRoute: StoreProductsRoute,
+  StoreProfileRoute: StoreProfileRoute,
+  StoreReportsRoute: StoreReportsRoute,
+  StoreSlotsRoute: StoreSlotsRoute,
   OrdersIndexRoute: OrdersIndexRoute,
+  StoreOrdersIndexRoute: StoreOrdersIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

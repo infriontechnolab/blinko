@@ -33,6 +33,30 @@ export type Product = {
   seller_id: string;
   /** Denormalized copy of the owning store's name, kept in sync with it. */
   store_name: string;
+  /** FK into the owning Category's `subcategories` — set by vendor-side product management. */
+  subcategoryId?: string;
+  /** Vendor-tracked unit count, independent of the `inStock` flag. */
+  stockQty?: number;
+  /** Unique within the vendor's own catalog (PRD 6.2). */
+  sku?: string;
+  barcode?: string;
+  /** PRD 6.2: min must be <= max, which must not exceed available stock. */
+  minOrderQty?: number;
+  maxOrderQty?: number;
+  /**
+   * Vendor-side visibility flag, distinct from `inStock` (PRD 6.2: "Disabling
+   * a product hides it from customers immediately but keeps it in past order
+   * records"). Only consumed by the vendor panel's own product list — the
+   * customer catalog reads `productsByStore()` directly and is unaffected.
+   */
+  enabled?: boolean;
+  /**
+   * Vendor-managed image gallery. `image` stays the single source customer
+   * components read (product-card, PDP, cart, etc.) — when a vendor manages
+   * a gallery, `images[0]` is kept in sync with `image` so those unchanged
+   * consumers still show the right "main" photo.
+   */
+  images?: string[];
 };
 
 export type StoreCategory = { id: string; name: string };
