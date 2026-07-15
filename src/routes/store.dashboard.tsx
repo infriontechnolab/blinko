@@ -1,25 +1,18 @@
 import { useState } from "react";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import {
-  Package,
-  ClipboardList,
-  AlertTriangle,
-  Clock,
-  IndianRupee,
-  CalendarClock,
-} from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Package, Truck, AlertTriangle, Clock, IndianRupee } from "lucide-react";
 import { BRAND } from "@/lib/brand";
 import { formatPrice } from "@/lib/cart-store";
 import { VendorProviders } from "@/components/store/vendor-providers";
 import { VendorAuthGuard } from "@/components/store/vendor-auth-guard";
 import { VendorShell } from "@/components/store/vendor-shell";
 import { OrderCard } from "@/components/store/order-card";
+import { OrderDetailPanel } from "@/components/store/order-detail-panel";
 import { Pager } from "@/components/store/pager";
 import { useVendorAuth } from "@/lib/store/vendor-auth-store";
 import { useVendorProducts } from "@/lib/store/vendor-products-store";
 import { useVendorOrders, RESERVING_STATUSES } from "@/lib/store/vendor-orders-store";
 import { useVendorStoreProfile } from "@/lib/store/vendor-store-profile-store";
-import { useVendorSlots } from "@/lib/store/vendor-slots-store";
 
 export const Route = createFileRoute("/store/dashboard")({
   head: () => ({ meta: [{ title: `Vendor Dashboard — ${BRAND.name}` }] }),
@@ -42,9 +35,8 @@ function DashboardContent() {
   const { products } = useVendorProducts(storeId);
   const orders = useVendorOrders(storeId);
   const { profile } = useVendorStoreProfile(storeId);
-  const { slots, holidays } = useVendorSlots(storeId);
-  const navigate = useNavigate();
   const [page, setPage] = useState(1);
+  const [selectedOrderId, setSelectedOrderId] = useState<string | undefined>(undefined);
 
   const threshold = profile?.lowStockThreshold ?? 5;
   const reservedFor = (productId: string) =>
@@ -57,10 +49,8 @@ function DashboardContent() {
     (p) => Math.max(0, (p.stockQty ?? 0) - reservedFor(p.id)) < threshold,
   ).length;
 
-  const placed = orders.filter((o) => o.vendorStatus === "placed").length;
-  const inProgress = orders.filter((o) =>
-    ["accepted", "preparing", "packed", "ready_for_delivery"].includes(o.vendorStatus),
-  ).length;
+  const placedOrders = orders.filter((o) => o.vendorStatus === "placed");
+  const readyForPickup = orders.filter((o) => o.vendorStatus === "ready_for_delivery").length;
 
   const todayKey = new Date().toISOString().slice(0, 10);
   const todaysRevenue = orders
@@ -85,11 +75,16 @@ function DashboardContent() {
       icon: AlertTriangle,
       tint: "bg-destructive/10 text-destructive",
     },
-    { label: "New orders", value: placed, icon: Clock, tint: "bg-accent/10 text-accent" },
     {
-      label: "In progress",
-      value: inProgress,
-      icon: ClipboardList,
+      label: "New orders",
+      value: placedOrders.length,
+      icon: Clock,
+      tint: "bg-accent/10 text-accent",
+    },
+    {
+      label: "Ready for pickup",
+      value: readyForPickup,
+      icon: Truck,
       tint: "bg-secondary text-secondary-foreground",
     },
     {
@@ -100,14 +95,13 @@ function DashboardContent() {
     },
   ];
 
-  const isHolidayToday = holidays.includes(todayKey);
-
-  const totalPages = Math.max(1, Math.ceil(orders.length / ORDERS_PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(placedOrders.length / ORDERS_PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
-  const pageOrders = orders.slice(
+  const pageOrders = placedOrders.slice(
     (currentPage - 1) * ORDERS_PAGE_SIZE,
     currentPage * ORDERS_PAGE_SIZE,
   );
+  const selectedOrder = placedOrders.find((o) => o.id === selectedOrderId);
 
   return (
     <div className="flex-1 overflow-y-auto p-6 md:p-8">
@@ -136,80 +130,51 @@ function DashboardContent() {
         })}
       </div>
 
-      <div className="mt-8">
-        <h2 className="text-lg font-bold">Upcoming delivery slots</h2>
-        <div className="mt-3 rounded-2xl border border-border bg-surface p-4">
-          {isHolidayToday ? (
-            <p className="mb-3 inline-flex items-center gap-1.5 rounded-lg bg-destructive/10 px-3 py-2 text-xs font-semibold text-destructive">
-              <CalendarClock className="size-3.5" />
-              Today is marked as a holiday — no slots available.
-            </p>
-          ) : null}
-          {slots.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              No delivery slots configured yet.{" "}
-              <Link to="/store/slots" className="font-semibold text-primary hover:underline">
-                Set some up
-              </Link>
-              .
+      <div className="mt-8 flex gap-4">
+        <div className={`min-w-0 flex-1 flex-col ${selectedOrder ? "hidden md:flex" : "flex"}`}>
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-bold">
+              Recent orders{" "}
+              <span className="font-normal text-muted-foreground">({placedOrders.length})</span>
+            </h2>
+            <Link to="/store/orders" className="text-sm font-semibold text-primary hover:underline">
+              Manage orders
+            </Link>
+          </div>
+
+          {placedOrders.length === 0 ? (
+            <p className="mt-3 rounded-2xl border border-border bg-surface p-10 text-center text-sm text-muted-foreground">
+              No new orders right now.
             </p>
           ) : (
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              {slots.map((s) => (
-                <div
-                  key={s.id}
-                  className="flex items-center justify-between rounded-xl border border-border px-3 py-2 text-sm"
-                >
-                  <div>
-                    <p className="font-medium">{s.label}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {s.start} – {s.end}
-                    </p>
-                  </div>
-                  <span className="text-xs text-muted-foreground">{s.capacity} orders</span>
-                </div>
-              ))}
-            </div>
+            <>
+              <div
+                className={`mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 ${selectedOrder ? "" : "lg:grid-cols-3"}`}
+              >
+                {pageOrders.map((o) => (
+                  <OrderCard
+                    key={o.id}
+                    order={o}
+                    selected={selectedOrderId === o.id}
+                    onClick={() => setSelectedOrderId(o.id)}
+                  />
+                ))}
+              </div>
+
+              <Pager
+                page={currentPage}
+                totalPages={totalPages}
+                pageSize={ORDERS_PAGE_SIZE}
+                totalItems={placedOrders.length}
+                onPageChange={setPage}
+              />
+            </>
           )}
         </div>
-      </div>
 
-      <div className="mt-8">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold">
-            Recent orders{" "}
-            <span className="font-normal text-muted-foreground">({orders.length})</span>
-          </h2>
-          <Link to="/store/orders" className="text-sm font-semibold text-primary hover:underline">
-            Manage orders
-          </Link>
-        </div>
-
-        {orders.length === 0 ? (
-          <p className="mt-3 rounded-2xl border border-border bg-surface p-10 text-center text-sm text-muted-foreground">
-            No orders yet.
-          </p>
-        ) : (
-          <>
-            <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {pageOrders.map((o) => (
-                <OrderCard
-                  key={o.id}
-                  order={o}
-                  onClick={() => navigate({ to: "/store/orders", search: { order: o.id } })}
-                />
-              ))}
-            </div>
-
-            <Pager
-              page={currentPage}
-              totalPages={totalPages}
-              pageSize={ORDERS_PAGE_SIZE}
-              totalItems={orders.length}
-              onPageChange={setPage}
-            />
-          </>
-        )}
+        {selectedOrder ? (
+          <OrderDetailPanel order={selectedOrder} onClose={() => setSelectedOrderId(undefined)} />
+        ) : null}
       </div>
     </div>
   );

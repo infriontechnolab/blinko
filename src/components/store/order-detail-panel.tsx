@@ -7,6 +7,8 @@ import { VendorOrderStatusStepper } from "@/components/store/vendor-order-status
 import { useVendorOrdersActions, type VendorOrder } from "@/lib/store/vendor-orders-store";
 import { VENDOR_STATUS_META } from "@/lib/store/vendor-order-status";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,24 +20,48 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const nextActionLabel: Record<string, string> = {
   accepted: "Start preparing",
   preparing: "Mark packed",
   packed: "Mark ready for delivery",
-  ready_for_delivery: "Mark delivered",
 };
 
 const TERMINAL_STATUSES = ["delivered", "rejected", "cancelled"];
 
+/** Ready for pickup is the last vendor-facing step — no further action button after it. */
+const NO_ACTION_STATUSES = [...TERMINAL_STATUSES, "ready_for_delivery"];
+
 export function OrderDetailPanel({ order, onClose }: { order: VendorOrder; onClose: () => void }) {
-  const { acceptOrder, rejectOrder, advanceStatus, cancelOrder, canCancel } =
+  const { acceptOrder, rejectOrder, advanceStatus, startPreparing, cancelOrder, canCancel } =
     useVendorOrdersActions();
   const [cancelOpen, setCancelOpen] = useState(false);
+  const [prepOpen, setPrepOpen] = useState(false);
+  const [preparerName, setPreparerName] = useState("");
+  const [preparerMobile, setPreparerMobile] = useState("");
 
   const isPlaced = order.vendorStatus === "placed";
-  const isActive = !TERMINAL_STATUSES.includes(order.vendorStatus);
+  const isAccepted = order.vendorStatus === "accepted";
+  const isActive = !NO_ACTION_STATUSES.includes(order.vendorStatus);
   const showCancel = canCancel(order.vendorStatus);
+
+  const canSubmitPrep = preparerName.trim() !== "" && /^\d{10}$/.test(preparerMobile.trim());
+
+  const confirmPreparing = () => {
+    if (!canSubmitPrep) return;
+    startPreparing(order.id, { name: preparerName.trim(), mobile: preparerMobile.trim() });
+    setPrepOpen(false);
+    setPreparerName("");
+    setPreparerMobile("");
+  };
 
   return (
     <div className="flex h-full w-full flex-col border-l border-border bg-surface md:w-[420px]">
@@ -56,15 +82,9 @@ export function OrderDetailPanel({ order, onClose }: { order: VendorOrder; onClo
             <span className="font-mono text-sm font-semibold">#{order.id}</span>
             <StatusPill status={order.vendorStatus} />
           </div>
-          <div className="mt-4 grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
-            <div>
-              <p className="text-xs text-muted-foreground">Delivery address</p>
-              <p className="mt-1 font-medium">{order.address}</p>
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground">Placed</p>
-              <p className="mt-1 font-medium">{new Date(order.placedAt).toLocaleString()}</p>
-            </div>
+          <div className="mt-4 text-sm">
+            <p className="text-xs text-muted-foreground">Placed</p>
+            <p className="mt-1 font-medium">{new Date(order.placedAt).toLocaleString()}</p>
           </div>
         </div>
 
@@ -73,6 +93,13 @@ export function OrderDetailPanel({ order, onClose }: { order: VendorOrder; onClo
             Status
           </p>
           <VendorOrderStatusStepper status={order.vendorStatus} />
+          {order.preparer ? (
+            <p className="mt-4 text-sm text-muted-foreground">
+              Preparing by{" "}
+              <span className="font-medium text-foreground">{order.preparer.name}</span> •{" "}
+              {order.preparer.mobile}
+            </p>
+          ) : null}
         </div>
 
         <div className="rounded-2xl border border-border p-4">
@@ -128,7 +155,10 @@ export function OrderDetailPanel({ order, onClose }: { order: VendorOrder; onClo
         </div>
       ) : isActive ? (
         <div className="flex items-center gap-3 border-t border-border p-5">
-          <Button onClick={() => advanceStatus(order.id)} className="flex-1 rounded-full">
+          <Button
+            onClick={() => (isAccepted ? setPrepOpen(true) : advanceStatus(order.id))}
+            className="flex-1 rounded-full"
+          >
             {nextActionLabel[order.vendorStatus]}
           </Button>
           {showCancel ? (
@@ -167,6 +197,43 @@ export function OrderDetailPanel({ order, onClose }: { order: VendorOrder; onClo
           </p>
         </div>
       )}
+
+      <Dialog open={prepOpen} onOpenChange={setPrepOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Who's preparing this order?</DialogTitle>
+            <DialogDescription>
+              Enter the preparer's name and mobile number to move this order to Preparing.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="preparer-name">Name</Label>
+              <Input
+                id="preparer-name"
+                value={preparerName}
+                onChange={(e) => setPreparerName(e.target.value)}
+                placeholder="Preparer's name"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="preparer-mobile">Mobile number</Label>
+              <Input
+                id="preparer-mobile"
+                value={preparerMobile}
+                onChange={(e) => setPreparerMobile(e.target.value)}
+                placeholder="10-digit mobile number"
+                inputMode="numeric"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button onClick={confirmPreparing} disabled={!canSubmitPrep} className="rounded-full">
+              Start preparing
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

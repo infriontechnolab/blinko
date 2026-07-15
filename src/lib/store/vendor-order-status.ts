@@ -26,7 +26,7 @@ export const VENDOR_STATUS_META: Record<
   preparing: { label: "Preparing", badgeClass: "bg-primary/10 text-primary", icon: ChefHat },
   packed: { label: "Packed", badgeClass: "bg-primary/20 text-primary", icon: PackageCheck },
   ready_for_delivery: {
-    label: "Ready for Delivery",
+    label: "Ready of Pickup",
     badgeClass: "bg-primary text-primary-foreground",
     icon: Truck,
   },

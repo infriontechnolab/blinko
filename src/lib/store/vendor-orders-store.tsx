@@ -32,7 +32,14 @@ export const VENDOR_STATUS_SEQUENCE: VendorOrderStatus[] = [
 /** Statuses from which a vendor may still cancel the order (PRD 9.1 rule #10). */
 const CANCELLABLE_FROM: VendorOrderStatus[] = ["placed", "accepted", "preparing"];
 
-type VendorOrderMeta = { vendorStatus: VendorOrderStatus; updatedAt: string };
+/** Person preparing the order — captured before an order can move from Accepted to Preparing. */
+export type Preparer = { name: string; mobile: string };
+
+type VendorOrderMeta = {
+  vendorStatus: VendorOrderStatus;
+  updatedAt: string;
+  preparer?: Preparer;
+};
 type VendorOrdersState = Record<string, VendorOrderMeta>;
 
 // v3: seeds 30 demo orders with a realistic status spread — bump the key so
@@ -72,9 +79,11 @@ const SEED_STATE: VendorOrdersState = Object.fromEntries(
 
 type VendorOrdersContextValue = {
   getStatus: (orderId: string) => VendorOrderStatus;
+  getPreparer: (orderId: string) => Preparer | undefined;
   acceptOrder: (orderId: string) => void;
   rejectOrder: (orderId: string) => void;
   advanceStatus: (orderId: string) => void;
+  startPreparing: (orderId: string, preparer: Preparer) => void;
   cancelOrder: (orderId: string) => void;
   canCancel: (status: VendorOrderStatus) => boolean;
 };
@@ -89,10 +98,14 @@ export function VendorOrdersProvider({ children }: { children: ReactNode }) {
   );
 
   const setStatus = useCallback(
-    (orderId: string, vendorStatus: VendorOrderStatus) => {
+    (orderId: string, vendorStatus: VendorOrderStatus, preparer?: Preparer) => {
       setState((prev) => ({
         ...prev,
-        [orderId]: { vendorStatus, updatedAt: new Date().toISOString() },
+        [orderId]: {
+          vendorStatus,
+          updatedAt: new Date().toISOString(),
+          preparer: preparer ?? prev[orderId]?.preparer,
+        },
       }));
     },
     [setState],
@@ -103,16 +116,32 @@ export function VendorOrdersProvider({ children }: { children: ReactNode }) {
     [state],
   );
 
+  const getPreparer = useCallback(
+    (orderId: string): Preparer | undefined => state[orderId]?.preparer,
+    [state],
+  );
+
   const acceptOrder = useCallback((orderId: string) => setStatus(orderId, "accepted"), [setStatus]);
 
   const rejectOrder = useCallback((orderId: string) => setStatus(orderId, "rejected"), [setStatus]);
 
+  /** Accepted -> Preparing requires the preparer's details; use startPreparing instead. */
   const advanceStatus = useCallback(
     (orderId: string) => {
       const current = state[orderId]?.vendorStatus ?? "placed";
+      if (current === "accepted") return;
       const idx = VENDOR_STATUS_SEQUENCE.indexOf(current);
       const next = VENDOR_STATUS_SEQUENCE[idx + 1];
       if (next) setStatus(orderId, next);
+    },
+    [state, setStatus],
+  );
+
+  const startPreparing = useCallback(
+    (orderId: string, preparer: Preparer) => {
+      const current = state[orderId]?.vendorStatus ?? "placed";
+      if (current !== "accepted") return;
+      setStatus(orderId, "preparing", preparer);
     },
     [state, setStatus],
   );
@@ -128,8 +157,26 @@ export function VendorOrdersProvider({ children }: { children: ReactNode }) {
   );
 
   const value = useMemo<VendorOrdersContextValue>(
-    () => ({ getStatus, acceptOrder, rejectOrder, advanceStatus, cancelOrder, canCancel }),
-    [getStatus, acceptOrder, rejectOrder, advanceStatus, cancelOrder, canCancel],
+    () => ({
+      getStatus,
+      getPreparer,
+      acceptOrder,
+      rejectOrder,
+      advanceStatus,
+      startPreparing,
+      cancelOrder,
+      canCancel,
+    }),
+    [
+      getStatus,
+      getPreparer,
+      acceptOrder,
+      rejectOrder,
+      advanceStatus,
+      startPreparing,
+      cancelOrder,
+      canCancel,
+    ],
   );
 
   return <VendorOrdersContext.Provider value={value}>{children}</VendorOrdersContext.Provider>;
@@ -150,6 +197,7 @@ export type VendorOrder = {
   items: VendorOrderItem[];
   subtotal: number;
   vendorStatus: VendorOrderStatus;
+  preparer?: Preparer;
 };
 
 /** Statuses that still hold stock in reservation (PRD 6.3 stock reservation flow). */
@@ -164,7 +212,7 @@ export const RESERVING_STATUSES: VendorOrderStatus[] = [
 /** All orders (live + demo history) that contain at least one item sold by `storeId`. */
 export function useVendorOrders(storeId: string): VendorOrder[] {
   const { stored } = useOrders();
-  const { getStatus } = useVendorOrdersActions();
+  const { getStatus, getPreparer } = useVendorOrdersActions();
 
   return useMemo(() => {
     const byId = new Map<string, StoredOrder | Order>();
@@ -186,9 +234,10 @@ export function useVendorOrders(storeId: string): VendorOrder[] {
         items: vendorItems,
         subtotal,
         vendorStatus: getStatus(order.id),
+        preparer: getPreparer(order.id),
       });
     }
 
     return relevant.sort((a, b) => new Date(b.placedAt).getTime() - new Date(a.placedAt).getTime());
-  }, [stored, storeId, getStatus]);
+  }, [stored, storeId, getStatus, getPreparer]);
 }

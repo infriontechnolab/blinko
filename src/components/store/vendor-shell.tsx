@@ -7,6 +7,7 @@ import {
   CalendarClock,
   Tag,
   BarChart3,
+  Wallet,
   Settings,
   LogOut,
   Menu,
@@ -36,6 +37,7 @@ const navItems = [
   { to: "/store/slots", label: "Delivery Slots", icon: CalendarClock },
   { to: "/store/coupons", label: "Coupons", icon: Tag },
   { to: "/store/reports", label: "Reports", icon: BarChart3 },
+  { to: "/store/payouts", label: "Payouts", icon: Wallet },
   { to: "/store/profile", label: "Store Profile", icon: Settings },
 ] as const;
 

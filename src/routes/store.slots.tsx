@@ -1,34 +1,14 @@
-import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Plus, Pencil, Trash2, X } from "lucide-react";
+import { X } from "lucide-react";
 import { BRAND } from "@/lib/brand";
 import { VendorProviders } from "@/components/store/vendor-providers";
 import { VendorAuthGuard } from "@/components/store/vendor-auth-guard";
 import { VendorShell } from "@/components/store/vendor-shell";
 import { useVendorAuth } from "@/lib/store/vendor-auth-store";
-import { useVendorSlots, type DeliverySlot } from "@/lib/store/vendor-slots-store";
+import { useVendorSlots } from "@/lib/store/vendor-slots-store";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 
 export const Route = createFileRoute("/store/slots")({
   head: () => ({ meta: [{ title: `Delivery Slots — ${BRAND.name} Vendor Portal` }] }),
@@ -68,180 +48,32 @@ function SlotsContent() {
   );
 }
 
-type SlotFormValues = Omit<DeliverySlot, "id">;
-
-const EMPTY_SLOT: SlotFormValues = { label: "", start: "", end: "", capacity: 10, cutoffTime: "" };
-
 function SlotsTab() {
   const { session } = useVendorAuth();
   const storeId = session!.storeId;
-  const { slots, addSlot, updateSlot, deleteSlot } = useVendorSlots(storeId);
-
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [editing, setEditing] = useState<DeliverySlot | undefined>(undefined);
-  const [values, setValues] = useState<SlotFormValues>(EMPTY_SLOT);
-  const [pendingDelete, setPendingDelete] = useState<DeliverySlot | undefined>(undefined);
-
-  const openAdd = () => {
-    setEditing(undefined);
-    setValues(EMPTY_SLOT);
-    setDialogOpen(true);
-  };
-
-  const openEdit = (s: DeliverySlot) => {
-    setEditing(s);
-    setValues({
-      label: s.label,
-      start: s.start,
-      end: s.end,
-      capacity: s.capacity,
-      cutoffTime: s.cutoffTime,
-    });
-    setDialogOpen(true);
-  };
-
-  const canSubmit = values.label.trim() && values.start && values.end && values.capacity > 0;
-
-  const handleSubmit = () => {
-    if (editing) updateSlot(editing.id, values);
-    else addSlot(values);
-    setDialogOpen(false);
-  };
+  const { slots } = useVendorSlots(storeId);
 
   return (
     <div className="mt-4">
-      <div className="flex justify-end">
-        <Button onClick={openAdd} className="rounded-full">
-          <Plus className="size-4" />
-          Add slot
-        </Button>
-      </div>
+      <p className="text-sm text-muted-foreground">
+        Delivery slots are set by the {BRAND.name} admin team and can't be added or edited from the
+        store side.
+      </p>
 
-      <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
         {slots.map((s) => (
           <div key={s.id} className="rounded-2xl border border-border bg-surface p-4">
-            <div className="flex items-start justify-between gap-2">
-              <div>
-                <p className="font-semibold">{s.label}</p>
-                <p className="text-sm text-muted-foreground">
-                  {s.start} – {s.end}
-                </p>
-              </div>
-              <div className="flex shrink-0 gap-1">
-                <Button variant="ghost" size="icon" onClick={() => openEdit(s)}>
-                  <Pencil className="size-4" />
-                </Button>
-                <Button variant="ghost" size="icon" onClick={() => setPendingDelete(s)}>
-                  <Trash2 className="size-4 text-destructive" />
-                </Button>
-              </div>
-            </div>
-            <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
-              <div>
-                <p className="text-[11px] text-muted-foreground">Capacity</p>
-                <p className="font-medium">{s.capacity} orders</p>
-              </div>
-              <div>
-                <p className="text-[11px] text-muted-foreground">Cutoff</p>
-                <p className="font-medium">{s.cutoffTime}</p>
-              </div>
+            <p className="font-semibold">{s.label}</p>
+            <p className="text-sm text-muted-foreground">
+              {s.start} – {s.end}
+            </p>
+            <div className="mt-3 text-sm">
+              <p className="text-[11px] text-muted-foreground">Cutoff</p>
+              <p className="font-medium">{s.cutoffTime}</p>
             </div>
           </div>
         ))}
       </div>
-
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>{editing ? "Edit slot" : "Add slot"}</DialogTitle>
-          </DialogHeader>
-          <div className="grid gap-4">
-            <div className="grid gap-1.5">
-              <Label htmlFor="sl-label">Label</Label>
-              <Input
-                id="sl-label"
-                value={values.label}
-                onChange={(e) => setValues((v) => ({ ...v, label: e.target.value }))}
-                placeholder="e.g. Morning"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="grid gap-1.5">
-                <Label htmlFor="sl-start">Start time</Label>
-                <Input
-                  id="sl-start"
-                  type="time"
-                  value={values.start}
-                  onChange={(e) => setValues((v) => ({ ...v, start: e.target.value }))}
-                />
-              </div>
-              <div className="grid gap-1.5">
-                <Label htmlFor="sl-end">End time</Label>
-                <Input
-                  id="sl-end"
-                  type="time"
-                  value={values.end}
-                  onChange={(e) => setValues((v) => ({ ...v, end: e.target.value }))}
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="grid gap-1.5">
-                <Label htmlFor="sl-capacity">Capacity</Label>
-                <Input
-                  id="sl-capacity"
-                  type="number"
-                  min={1}
-                  value={values.capacity}
-                  onChange={(e) =>
-                    setValues((v) => ({ ...v, capacity: Number(e.target.value) || 0 }))
-                  }
-                />
-              </div>
-              <div className="grid gap-1.5">
-                <Label htmlFor="sl-cutoff">Cutoff time</Label>
-                <Input
-                  id="sl-cutoff"
-                  value={values.cutoffTime}
-                  onChange={(e) => setValues((v) => ({ ...v, cutoffTime: e.target.value }))}
-                  placeholder="e.g. 9:00 PM (day before)"
-                />
-              </div>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button disabled={!canSubmit} onClick={handleSubmit}>
-              {editing ? "Save changes" : "Add slot"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <AlertDialog
-        open={!!pendingDelete}
-        onOpenChange={(open) => !open && setPendingDelete(undefined)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete "{pendingDelete?.label}"?</AlertDialogTitle>
-            <AlertDialogDescription>This can't be undone.</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                if (pendingDelete) deleteSlot(pendingDelete.id);
-                setPendingDelete(undefined);
-              }}
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 }

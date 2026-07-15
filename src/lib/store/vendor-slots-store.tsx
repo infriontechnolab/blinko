@@ -13,43 +13,30 @@ export type DeliverySlot = {
 type VendorSlotsRecord = { slots: DeliverySlot[]; holidays: string[] };
 type VendorSlotsState = Record<string, VendorSlotsRecord>;
 
-const KEY = "blinko-vendor-slots-v1";
+// v2: reseeded down to the 2 admin-managed slots — bump the key so browsers
+// with an already-persisted v1 (4-slot) record pick up the new seed too.
+const KEY = "blinko-vendor-slots-v2";
 
-// Seeded with the PRD's own example slots (6.4).
+// Slots are configured by the admin team, not the vendor — the store side only
+// ever sees these two fixed windows (PRD 6.4).
 const SEED: VendorSlotsState = {
   "spice-hub": {
     slots: [
       {
-        id: "slot-morning",
-        label: "Morning",
-        start: "06:00",
-        end: "08:00",
-        capacity: 20,
-        cutoffTime: "9:00 PM (day before)",
-      },
-      {
         id: "slot-afternoon",
-        label: "Afternoon",
-        start: "12:00",
-        end: "14:00",
+        label: "Today, 2:00 PM – 5:00 PM",
+        start: "14:00",
+        end: "17:00",
         capacity: 25,
-        cutoffTime: "9:00 AM (same day)",
+        cutoffTime: "12:00 PM (same day)",
       },
       {
-        id: "slot-evening",
-        label: "Evening",
-        start: "17:00",
-        end: "19:00",
-        capacity: 30,
-        cutoffTime: "1:00 PM (same day)",
-      },
-      {
-        id: "slot-night",
-        label: "Night",
-        start: "20:00",
-        end: "22:00",
-        capacity: 15,
-        cutoffTime: "5:00 PM (same day)",
+        id: "slot-next-day",
+        label: "Next Day Delivery",
+        start: "09:00",
+        end: "21:00",
+        capacity: 40,
+        cutoffTime: "9:00 PM (day before)",
       },
     ],
     holidays: [],

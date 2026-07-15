@@ -12,6 +12,7 @@ const VENDOR_PATH_PREFIXES = [
   "/store/slots",
   "/store/coupons",
   "/store/reports",
+  "/store/payouts",
   "/store/profile",
 ];
 

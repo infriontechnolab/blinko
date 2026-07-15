@@ -20,6 +20,7 @@ import { Route as StoreSlotsRouteImport } from './routes/store.slots'
 import { Route as StoreReportsRouteImport } from './routes/store.reports'
 import { Route as StoreProfileRouteImport } from './routes/store.profile'
 import { Route as StoreProductsRouteImport } from './routes/store.products'
+import { Route as StorePayoutsRouteImport } from './routes/store.payouts'
 import { Route as StoreLoginRouteImport } from './routes/store.login'
 import { Route as StoreInventoryRouteImport } from './routes/store.inventory'
 import { Route as StoreDashboardRouteImport } from './routes/store.dashboard'
@@ -84,6 +85,11 @@ const StoreProductsRoute = StoreProductsRouteImport.update({
   path: '/store/products',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StorePayoutsRoute = StorePayoutsRouteImport.update({
+  id: '/store/payouts',
+  path: '/store/payouts',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StoreLoginRoute = StoreLoginRouteImport.update({
   id: '/store/login',
   path: '/store/login',
@@ -139,6 +145,7 @@ export interface FileRoutesByFullPath {
   '/store/dashboard': typeof StoreDashboardRoute
   '/store/inventory': typeof StoreInventoryRoute
   '/store/login': typeof StoreLoginRoute
+  '/store/payouts': typeof StorePayoutsRoute
   '/store/products': typeof StoreProductsRoute
   '/store/profile': typeof StoreProfileRoute
   '/store/reports': typeof StoreReportsRoute
@@ -160,6 +167,7 @@ export interface FileRoutesByTo {
   '/store/dashboard': typeof StoreDashboardRoute
   '/store/inventory': typeof StoreInventoryRoute
   '/store/login': typeof StoreLoginRoute
+  '/store/payouts': typeof StorePayoutsRoute
   '/store/products': typeof StoreProductsRoute
   '/store/profile': typeof StoreProfileRoute
   '/store/reports': typeof StoreReportsRoute
@@ -182,6 +190,7 @@ export interface FileRoutesById {
   '/store/dashboard': typeof StoreDashboardRoute
   '/store/inventory': typeof StoreInventoryRoute
   '/store/login': typeof StoreLoginRoute
+  '/store/payouts': typeof StorePayoutsRoute
   '/store/products': typeof StoreProductsRoute
   '/store/profile': typeof StoreProfileRoute
   '/store/reports': typeof StoreReportsRoute
@@ -205,6 +214,7 @@ export interface FileRouteTypes {
     | '/store/dashboard'
     | '/store/inventory'
     | '/store/login'
+    | '/store/payouts'
     | '/store/products'
     | '/store/profile'
     | '/store/reports'
@@ -226,6 +236,7 @@ export interface FileRouteTypes {
     | '/store/dashboard'
     | '/store/inventory'
     | '/store/login'
+    | '/store/payouts'
     | '/store/products'
     | '/store/profile'
     | '/store/reports'
@@ -247,6 +258,7 @@ export interface FileRouteTypes {
     | '/store/dashboard'
     | '/store/inventory'
     | '/store/login'
+    | '/store/payouts'
     | '/store/products'
     | '/store/profile'
     | '/store/reports'
@@ -269,6 +281,7 @@ export interface RootRouteChildren {
   StoreDashboardRoute: typeof StoreDashboardRoute
   StoreInventoryRoute: typeof StoreInventoryRoute
   StoreLoginRoute: typeof StoreLoginRoute
+  StorePayoutsRoute: typeof StorePayoutsRoute
   StoreProductsRoute: typeof StoreProductsRoute
   StoreProfileRoute: typeof StoreProfileRoute
   StoreReportsRoute: typeof StoreReportsRoute
@@ -356,6 +369,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StoreProductsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/store/payouts': {
+      id: '/store/payouts'
+      path: '/store/payouts'
+      fullPath: '/store/payouts'
+      preLoaderRoute: typeof StorePayoutsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/store/login': {
       id: '/store/login'
       path: '/store/login'
@@ -429,6 +449,7 @@ const rootRouteChildren: RootRouteChildren = {
   StoreDashboardRoute: StoreDashboardRoute,
   StoreInventoryRoute: StoreInventoryRoute,
   StoreLoginRoute: StoreLoginRoute,
+  StorePayoutsRoute: StorePayoutsRoute,
   StoreProductsRoute: StoreProductsRoute,
   StoreProfileRoute: StoreProfileRoute,
   StoreReportsRoute: StoreReportsRoute,

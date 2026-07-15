@@ -34,11 +34,7 @@ const FILTERS: { key: "all" | VendorOrderStatus; label: string }[] = [
   { key: "placed", label: VENDOR_STATUS_META.placed.label },
   { key: "accepted", label: VENDOR_STATUS_META.accepted.label },
   { key: "preparing", label: VENDOR_STATUS_META.preparing.label },
-  { key: "packed", label: VENDOR_STATUS_META.packed.label },
   { key: "ready_for_delivery", label: VENDOR_STATUS_META.ready_for_delivery.label },
-  { key: "delivered", label: VENDOR_STATUS_META.delivered.label },
-  { key: "rejected", label: VENDOR_STATUS_META.rejected.label },
-  { key: "cancelled", label: VENDOR_STATUS_META.cancelled.label },
 ];
 
 function OrdersContent() {
@@ -98,7 +94,7 @@ function OrdersContent() {
                     : "text-muted-foreground hover:bg-muted"
                 }`}
               >
-                {f.label} {count}
+                {f.label} ({count})
               </button>
             );
           })}

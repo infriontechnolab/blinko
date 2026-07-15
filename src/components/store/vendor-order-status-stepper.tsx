@@ -2,6 +2,14 @@ import { XCircle } from "lucide-react";
 import { VENDOR_STATUS_SEQUENCE, type VendorOrderStatus } from "@/lib/store/vendor-orders-store";
 import { VENDOR_STATUS_META } from "@/lib/store/vendor-order-status";
 
+/** Steps shown in the stepper — Packed and Delivered are tracked internally but not displayed. */
+const DISPLAY_SEQUENCE: VendorOrderStatus[] = [
+  "placed",
+  "accepted",
+  "preparing",
+  "ready_for_delivery",
+];
+
 export function VendorOrderStatusStepper({ status }: { status: VendorOrderStatus }) {
   if (status === "cancelled" || status === "rejected") {
     return (
@@ -12,8 +20,12 @@ export function VendorOrderStatusStepper({ status }: { status: VendorOrderStatus
     );
   }
 
-  const currentIndex = VENDOR_STATUS_SEQUENCE.indexOf(status);
-  const progressPct = (currentIndex / (VENDOR_STATUS_SEQUENCE.length - 1)) * 100;
+  const realIndex = VENDOR_STATUS_SEQUENCE.indexOf(status);
+  const currentIndex = DISPLAY_SEQUENCE.reduce(
+    (acc, step, i) => (VENDOR_STATUS_SEQUENCE.indexOf(step) <= realIndex ? i : acc),
+    0,
+  );
+  const progressPct = (currentIndex / (DISPLAY_SEQUENCE.length - 1)) * 100;
 
   return (
     <div className="overflow-x-auto">
@@ -23,8 +35,8 @@ export function VendorOrderStatusStepper({ status }: { status: VendorOrderStatus
           className="absolute left-4 top-4 h-0.5 bg-primary transition-all duration-500"
           style={{ width: `calc((100% - 2rem) * ${progressPct / 100})` }}
         />
-        <ol className="relative grid grid-cols-6 gap-1">
-          {VENDOR_STATUS_SEQUENCE.map((step, i) => {
+        <ol className="relative grid grid-cols-4 gap-1">
+          {DISPLAY_SEQUENCE.map((step, i) => {
             const meta = VENDOR_STATUS_META[step];
             const Icon = meta.icon;
             const done = i <= currentIndex;
