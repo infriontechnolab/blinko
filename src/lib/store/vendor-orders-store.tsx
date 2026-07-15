@@ -188,6 +188,18 @@ export function useVendorOrdersActions() {
   return ctx;
 }
 
+/**
+ * Reads an order's vendor-side status directly from the same persisted
+ * storage `VendorOrdersProvider` uses — standalone, no provider required.
+ * Lets customer-facing routes (outside the vendor portal's provider tree)
+ * check the vendor's real status, e.g. to show the order chat once a
+ * vendor marks an order "preparing".
+ */
+export function useVendorOrderStatus(orderId: string): VendorOrderStatus {
+  const [state] = usePersistentState<VendorOrdersState>(KEY, SEED_STATE, isVendorOrdersState);
+  return state[orderId]?.vendorStatus ?? "placed";
+}
+
 export type VendorOrderItem = { productId: string; qty: number; price: number };
 
 export type VendorOrder = {

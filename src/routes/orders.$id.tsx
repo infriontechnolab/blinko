@@ -4,7 +4,9 @@ import { CheckCircle2, MapPin, Clock, Phone, ArrowLeft } from "lucide-react";
 import { pastOrders, getProduct, type Order } from "@/lib/mock-data";
 import { formatPrice } from "@/lib/cart-store";
 import { useOrders, useNow, hydrateOrder } from "@/lib/orders-store";
+import { useVendorOrderStatus } from "@/lib/store/vendor-orders-store";
 import { OrderTracker } from "@/components/order-tracker";
+import { OrderChatBox } from "@/components/order-chat-box";
 import { BRAND } from "@/lib/brand";
 
 const search = z.object({ just_placed: z.coerce.number().optional() });
@@ -22,6 +24,7 @@ function OrderDetail() {
   const { just_placed } = Route.useSearch();
   const { getStored } = useOrders();
   const now = useNow(1000);
+  const vendorStatus = useVendorOrderStatus(id);
 
   // Resolve a freshly placed order (client-only, live status) first, then fall
   // back to the static demo history. now === 0 means not yet mounted.
@@ -171,6 +174,12 @@ function OrderDetail() {
           </ol>
         </section>
       </div>
+
+      {vendorStatus === "preparing" ? (
+        <div className="mt-6">
+          <OrderChatBox orderId={order.id} sender="customer" title="Chat with the store" />
+        </div>
+      ) : null}
 
       <section className="mt-8 rounded-2xl border border-border bg-surface">
         <div className="border-b border-border p-5">

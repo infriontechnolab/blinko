@@ -2,6 +2,7 @@ import { useState } from "react";
 import { X } from "lucide-react";
 import { getProduct } from "@/lib/mock-data";
 import { formatPrice } from "@/lib/cart-store";
+import { OrderChatBox } from "@/components/order-chat-box";
 import { StatusPill } from "@/components/store/status-pill";
 import { VendorOrderStatusStepper } from "@/components/store/vendor-order-status-stepper";
 import { useVendorOrdersActions, type VendorOrder } from "@/lib/store/vendor-orders-store";
@@ -101,6 +102,10 @@ export function OrderDetailPanel({ order, onClose }: { order: VendorOrder; onClo
             </p>
           ) : null}
         </div>
+
+        {order.vendorStatus === "preparing" ? (
+          <OrderChatBox orderId={order.id} sender="vendor" title="Chat with customer" />
+        ) : null}
 
         <div className="rounded-2xl border border-border p-4">
           <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">

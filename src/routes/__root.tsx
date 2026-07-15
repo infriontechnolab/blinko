@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { CartProvider } from "@/lib/cart-store";
 import { WishlistProvider } from "@/lib/wishlist-store";
 import { OrdersProvider } from "@/lib/orders-store";
+import { OrderChatProvider } from "@/lib/store/order-chat-store";
 import { CategoriesPanelProvider } from "@/lib/categories-panel";
 import { BRAND } from "@/lib/brand";
 import { SiteHeader } from "@/components/site-header";
@@ -132,16 +133,18 @@ function RootComponent() {
     <CartProvider>
       <WishlistProvider>
         <OrdersProvider>
-          <CategoriesPanelProvider>
-            <div className="flex min-h-screen flex-col bg-background">
-              {!isVendorPortal ? <SiteHeader /> : null}
-              <main className="flex-1">
-                <Outlet />
-              </main>
-              {!isVendorPortal ? <SiteFooter /> : null}
-              <Toaster position="bottom-center" />
-            </div>
-          </CategoriesPanelProvider>
+          <OrderChatProvider>
+            <CategoriesPanelProvider>
+              <div className="flex min-h-screen flex-col bg-background">
+                {!isVendorPortal ? <SiteHeader /> : null}
+                <main className="flex-1">
+                  <Outlet />
+                </main>
+                {!isVendorPortal ? <SiteFooter /> : null}
+                <Toaster position="bottom-center" />
+              </div>
+            </CategoriesPanelProvider>
+          </OrderChatProvider>
         </OrdersProvider>
       </WishlistProvider>
     </CartProvider>

@@ -44,7 +44,7 @@ function OrdersContent() {
   const { order: selectedId } = Route.useSearch();
   const navigate = useNavigate();
 
-  const [filter, setFilter] = useState<"all" | VendorOrderStatus>("all");
+  const [filter, setFilter] = useState<"all" | VendorOrderStatus>("placed");
   const [query, setQuery] = useState("");
 
   const selectOrder = (id: string | undefined) =>

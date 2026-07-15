@@ -39,3 +39,4 @@ demo/
 # Local tooling / artifacts
 CLAUDE.md
 demo-video/
+.env*
